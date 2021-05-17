@@ -1,6 +1,7 @@
-# roshetta
+# Roshetta
 
-A new Flutter project.
+A Machine Learning - Flutter project.
+Project Demo: https://youtu.be/cjFqlsPH_rk
 
 ## Getting Started
 
