@@ -66,11 +66,16 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
                     radius: 70,
                     backgroundColor: Pallet().white_R,
                     child: ClipOval(
-                        child: Image.network(
+                        child: photoUrl!=null?Image.network(
                           photoUrl,
                           height: 150,
                           width: 300,
-                        ))),
+                        ):Image.asset(
+                          'images/newDoctor.png',
+                          height: 180,
+                          width: 300,
+                        )
+                    )),
               )
                   : Image.asset(
                 'images/newDoctor.png',

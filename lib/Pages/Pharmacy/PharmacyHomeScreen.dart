@@ -66,11 +66,16 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen> {
                     radius: 70,
                     backgroundColor: Pallet().white_R,
                     child: ClipOval(
-                        child: Image.network(
+                        child: photoUrl!=null?Image.network(
                           photoUrl,
                           height: 150,
                           width: 300,
-                        ))),
+                        ):Image.asset(
+                          'images/newPharmacy.png',
+                          height: 180,
+                          width: 300,
+                        )
+                    )),
               )
                   : Image.asset(
                 'images/newPharmacy.png',
