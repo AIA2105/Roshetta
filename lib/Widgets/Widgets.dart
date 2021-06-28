@@ -111,9 +111,9 @@ class Widgets{
                 )),
             mode: DateTimeFieldPickerMode.date,
             autovalidateMode: AutovalidateMode.always,
-            validator: (e) => (e?.day ?? 0) == 1
-                ? 'Please not the first day'
-                : null,
+            // validator: (e) => (e?.day ?? 0) == 1
+            //     ? 'Please not the first day'
+            //     : null,
             onDateSelected: function,
           ),
         ),

@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:roshetta/Constants/Pallet.dart';
 import '../Login System/LoginScreen.dart';
+import 'DoctorDatabase.dart';
 
 class DoctorHomeScreen extends StatefulWidget {
   const DoctorHomeScreen({Key key}) : super(key: key);
@@ -122,6 +124,9 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
                 ),
                 FlatButton(
                   onPressed: () async {
+
+                    DoctorDatabase().delete(FirebaseAuth.instance.currentUser.uid);
+                    FirebaseStorage.instance.ref().child("Profile Photos/${FirebaseAuth.instance.currentUser.uid}").delete().then((value) => print('photo deleted !'));
                     var delData = await FirebaseFirestore.instance
                         .collection('users')
                         .doc(FirebaseAuth.instance.currentUser.uid)

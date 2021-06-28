@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:roshetta/AI/camera.dart';
 import 'package:roshetta/Constants/Pallet.dart';
+import 'package:roshetta/Pages/Patient/PatientDatabase.dart';
 import '../Login System/LoginScreen.dart';
 
 class PatientHomeScreen extends StatefulWidget {
@@ -41,6 +44,15 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.camera_alt),
+        backgroundColor: Pallet().blue_R,
+        onPressed: (){
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => Camera()));
+        },
+      ),
       backgroundColor: Color(0xFFF5F5F5),
       appBar: AppBar(
         centerTitle: true,
@@ -122,6 +134,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
             ),
             FlatButton(
               onPressed: () async {
+
+                PatientDatabase().delete(FirebaseAuth.instance.currentUser.uid);
+                FirebaseStorage.instance.ref().child("Profile Photos/${FirebaseAuth.instance.currentUser.uid}").delete().then((value) => print('photo deleted !'));
                 var delData = await FirebaseFirestore.instance
                     .collection('users')
                     .doc(FirebaseAuth.instance.currentUser.uid)
@@ -130,6 +145,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (context) => LoginScreen()));
                 print('Auth & data deleted');
+
               },
               child: Text(
                 'حذف الحساب',

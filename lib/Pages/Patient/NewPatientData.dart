@@ -6,16 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:roshetta/Constants/Pallet.dart';
 import 'package:roshetta/Constants/Spaces.dart';
-import 'package:roshetta/Pages/Login%20System/ChooseNewUser.dart';
 import 'package:roshetta/Pages/Login%20System/LoginScreen.dart';
 import 'package:roshetta/Pages/Patient/PatientHomeScreen.dart';
 import 'package:roshetta/Widgets/InputField_R.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+import 'PatientDatabase.dart';
+
 class NewPatientData extends StatefulWidget {
   const NewPatientData({Key key}) : super(key: key);
-
   @override
   _NewPatientDataState createState() => _NewPatientDataState();
 }
@@ -35,23 +35,25 @@ class _NewPatientDataState extends State<NewPatientData> {
   final picker = ImagePicker();
   String _profileImageUrl;
 
-
   Future pickImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    } else {
+      print('No image selected.');
+    }
+  }
 
-      if (pickedFile != null) {
-        setState(() {
-          _image = File(pickedFile.path);
-        });
-        String filename = FirebaseAuth.instance.currentUser.uid;
-        Reference storageReference = FirebaseStorage.instance.ref().child("Profile Photos/$filename");
-        final UploadTask uploadTask = storageReference.putFile(_image);
-        final TaskSnapshot downloadUrl = (await uploadTask);
-        _profileImageUrl = await downloadUrl.ref.getDownloadURL();
-        print('$_image uploaded!');
-      } else {
-        print('No image selected.');
-      }
+  Future uploadImage() async {
+    String filename = FirebaseAuth.instance.currentUser.uid;
+    Reference storageReference =
+    FirebaseStorage.instance.ref().child("Profile Photos/$filename");
+    final UploadTask uploadTask = storageReference.putFile(_image);
+    final TaskSnapshot downloadUrl = (await uploadTask);
+    _profileImageUrl = await downloadUrl.ref.getDownloadURL();
+    print('$_image uploaded!');
   }
 
 
@@ -66,7 +68,7 @@ class _NewPatientDataState extends State<NewPatientData> {
               color: Pallet().blue_R,
               size: Spaces().backButton,
             ),
-            onPressed: () async{
+            onPressed: () async {
               var delData = await FirebaseFirestore.instance
                   .collection('users')
                   .doc(FirebaseAuth.instance.currentUser.uid)
@@ -97,49 +99,59 @@ class _NewPatientDataState extends State<NewPatientData> {
                   InkWell(
                     child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 20),
-                        child: Stack(children: [
-                          _image != null
-                              ? Padding(
-                                  padding: const EdgeInsets.only(bottom: 20),
-                                  child: CircleAvatar(
-                                    radius: 75,
-                                    backgroundColor: Pallet().blue_R,
-                                    child: CircleAvatar(
-                                        radius: 70,
-                                        backgroundColor: Pallet().white_R,
-                                        child: ClipOval(
-                                            child: Image.file(
-                                          _image,
-                                          height: 150,
-                                          width: 300,
-                                        ))),
-                                  ),
-                                )
-                              : Image.asset(
-                                  'images/newPatient.png',
-                                  height: 180,
-                                  width: 300,
-                                ),
-                          Positioned.fill(
-                            bottom: 8,
-                              child: Align(
-                                alignment: Alignment.bottomCenter,
-                                child: Stack(
-                                  children: [
-                                    Icon(
-                                      Icons.circle,
-                                      size: 30,
-                                      color: Pallet().white_R,
+                        child: Column(
+                          children: [
+                            Stack(children: [
+                              _image != null
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(bottom: 20),
+                                      child: CircleAvatar(
+                                        radius: 75,
+                                        backgroundColor: Pallet().blue_R,
+                                        child: CircleAvatar(
+                                            radius: 70,
+                                            backgroundColor: Pallet().white_R,
+                                            child: ClipOval(
+                                                child: Image.file(
+                                              _image,
+                                              height: 150,
+                                              width: 300,
+                                            ))),
+                                      ),
+                                    )
+                                  : Image.asset(
+                                      'images/newPatient.png',
+                                      height: 180,
+                                      width: 300,
                                     ),
-                                    Icon(
-                                      Icons.add_circle,
-                                      size: 30,
-                                      color: Pallet().red_R,
-                                    ),
-                                  ],
-                                ),
-                              )),
-                        ])),
+                              Positioned.fill(
+                                  bottom: 8,
+                                  child: Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: Stack(
+                                      children: [
+                                        Icon(
+                                          Icons.circle,
+                                          size: 30,
+                                          color: Pallet().white_R,
+                                        ),
+                                        Icon(
+                                          Icons.add_circle,
+                                          size: 30,
+                                          color: Pallet().red_R,
+                                        ),
+                                      ],
+                                    )
+                                  )),
+                            ]),
+
+                            Text('الصورة الشخصية', style: TextStyle(
+                                color:Pallet().red_R,
+                                fontFamily: 'arabic',
+                                fontSize: 20)),
+
+                          ],
+                        )),
                     onTap: () {
                       pickImage();
                     },
@@ -332,7 +344,6 @@ class _NewPatientDataState extends State<NewPatientData> {
                             ),
                           ),
                           onPressed: () async {
-                            ////////////////////////////////////////////////////////
                             if (_firstNamecontroller.text.isNotEmpty &&
                                 _lastNamecontroller.text.isNotEmpty &&
                                 _addresscontroller.text.isNotEmpty &&
@@ -340,34 +351,59 @@ class _NewPatientDataState extends State<NewPatientData> {
                                 _birthday.isNotEmpty &&
                                 _heightcontroller.text.isNotEmpty &&
                                 _weighthcontroller.text.isNotEmpty) {
-                              FirebaseFirestore.instance
-                                  .collection('users')
-                                  .doc(FirebaseAuth.instance.currentUser.uid)
-                                  .set({
-                                'id': 1,
-                                'email': FirebaseAuth.instance.currentUser.email,
-                                'First name': _firstNamecontroller.text,
-                                'Last name': _lastNamecontroller.text,
-                                'Address': _addresscontroller.text,
-                                'Phone': _phonecontroller.text,
-                                'Birthday': _birthday,
-                                'Height': _heightcontroller.text,
-                                'Weight': _weighthcontroller.text,
-                                'State': _state != null ? _state : _states[0],
-                                'Gender': _gender != null ? _gender : _genders[0],
-                                'Blood': _blood != null ? _blood : _bloods[0],
-                                'Profile Image URL':_profileImageUrl!=null?_profileImageUrl:'null'
+
+                              await uploadImage().then((value){
+                                ////////////////////////////////////////////////////////
+                                PatientDatabase().post(
+                                    FirebaseAuth.instance.currentUser.email,
+                                    _addresscontroller.text,
+                                    _blood != null ? _blood : _bloods[0],
+                                    _birthday,
+                                    _firstNamecontroller.text,
+                                    _lastNamecontroller.text,
+                                    _gender != null ? _gender : _genders[0],
+                                    _heightcontroller.text,
+                                    FirebaseAuth.instance.currentUser.uid,
+                                    _phonecontroller.text,
+                                    _profileImageUrl != null ? _profileImageUrl : 'null',
+                                    _state != null ? _state : _states[0],
+                                    _weighthcontroller.text);
+                                ////////////////////////////////////////////////////////
+
+                                FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(FirebaseAuth.instance.currentUser.uid)
+                                    .set({
+                                  'id': 1,
+                                  'email':
+                                  FirebaseAuth.instance.currentUser.email,
+                                  'First name': _firstNamecontroller.text,
+                                  'Last name': _lastNamecontroller.text,
+                                  'Address': _addresscontroller.text,
+                                  'Phone': _phonecontroller.text,
+                                  'Birthday': _birthday,
+                                  'Height': _heightcontroller.text,
+                                  'Weight': _weighthcontroller.text,
+                                  'State': _state != null ? _state : _states[0],
+                                  'Gender':
+                                  _gender != null ? _gender : _genders[0],
+                                  'Blood': _blood != null ? _blood : _bloods[0],
+                                  'Profile Image URL': _profileImageUrl != null
+                                      ? _profileImageUrl
+                                      : 'null'
+                                });
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => PatientHomeScreen()),
+                                );
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    Widgets().snakbar(
+                                        text: 'تم انشاء الحساب بنجاح',
+                                        background: Pallet().green,
+                                        duration: 2));
                               });
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => PatientHomeScreen()),
-                              );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  Widgets().snakbar(
-                                      text: 'تم انشاء الحساب بنجاح',
-                                      background: Pallet().green,
-                                      duration: 2));
+
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   Widgets().snakbar(

@@ -12,6 +12,7 @@ import 'package:roshetta/Widgets/InputField_R.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+import 'PharmacyDatabase.dart';
 import 'PharmacyHomeScreen.dart';
 
 class NewPharmacyData extends StatefulWidget {
@@ -35,22 +36,25 @@ class _NewPharmacyDataState extends State<NewPharmacyData> {
 
   Future pickImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
-
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
       });
-      String filename = FirebaseAuth.instance.currentUser.uid;
-      Reference storageReference =
-      FirebaseStorage.instance.ref().child("Profile Photos/$filename");
-      final UploadTask uploadTask = storageReference.putFile(_image);
-      final TaskSnapshot downloadUrl = (await uploadTask);
-      _profileImageUrl = await downloadUrl.ref.getDownloadURL();
-      print('$_image uploaded!');
     } else {
       print('No image selected.');
     }
   }
+
+  Future uploadImage() async {
+    String filename = FirebaseAuth.instance.currentUser.uid;
+    Reference storageReference =
+    FirebaseStorage.instance.ref().child("Profile Photos/$filename");
+    final UploadTask uploadTask = storageReference.putFile(_image);
+    final TaskSnapshot downloadUrl = (await uploadTask);
+    _profileImageUrl = await downloadUrl.ref.getDownloadURL();
+    print('$_image uploaded!');
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -94,49 +98,59 @@ class _NewPharmacyDataState extends State<NewPharmacyData> {
                   InkWell(
                     child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 20),
-                        child: Stack(children: [
-                          _image != null
-                              ? Padding(
-                            padding: const EdgeInsets.only(bottom: 20),
-                            child: CircleAvatar(
-                              radius: 75,
-                              backgroundColor: Pallet().blue_R,
-                              child: CircleAvatar(
-                                  radius: 70,
-                                  backgroundColor: Pallet().white_R,
-                                  child: ClipOval(
-                                      child: Image.file(
-                                        _image,
-                                        height: 150,
-                                        width: 300,
-                                      ))),
-                            ),
-                          )
-                              : Image.asset(
-                            'images/newPharmacy.png',
-                            height: 180,
-                            width: 300,
-                          ),
-                          Positioned.fill(
-                              bottom: 8,
-                              child: Align(
-                                alignment: Alignment.bottomCenter,
-                                child: Stack(
-                                  children: [
-                                    Icon(
-                                      Icons.circle,
-                                      size: 30,
-                                      color: Pallet().white_R,
-                                    ),
-                                    Icon(
-                                      Icons.add_circle,
-                                      size: 30,
-                                      color: Pallet().red_R,
-                                    ),
-                                  ],
+                        child: Column(
+                          children: [
+                            Stack(children: [
+                              _image != null
+                                  ? Padding(
+                                padding: const EdgeInsets.only(bottom: 20),
+                                child: CircleAvatar(
+                                  radius: 75,
+                                  backgroundColor: Pallet().blue_R,
+                                  child: CircleAvatar(
+                                      radius: 70,
+                                      backgroundColor: Pallet().white_R,
+                                      child: ClipOval(
+                                          child: Image.file(
+                                            _image,
+                                            height: 150,
+                                            width: 300,
+                                          ))),
                                 ),
-                              )),
-                        ])),
+                              )
+                                  : Image.asset(
+                                'images/newPharmacy.png',
+                                height: 180,
+                                width: 300,
+                              ),
+                              Positioned.fill(
+                                  bottom: 8,
+                                  child: Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: Stack(
+                                        children: [
+                                          Icon(
+                                            Icons.circle,
+                                            size: 30,
+                                            color: Pallet().white_R,
+                                          ),
+                                          Icon(
+                                            Icons.add_circle,
+                                            size: 30,
+                                            color: Pallet().red_R,
+                                          ),
+                                        ],
+                                      )
+                                  )),
+                            ]),
+
+                            Text('الصورة الشخصية', style: TextStyle(
+                                color:Pallet().red_R,
+                                fontFamily: 'arabic',
+                                fontSize: 20)),
+
+                          ],
+                        )),
                     onTap: () {
                       pickImage();
                     },
@@ -290,33 +304,54 @@ class _NewPharmacyDataState extends State<NewPharmacyData> {
                                 _addressController.text.isNotEmpty &&
                                 _phoneController.text.isNotEmpty &&
                                 _pharmacyNameController.text.isNotEmpty) {
-                              FirebaseFirestore.instance
-                                  .collection('users')
-                                  .doc(FirebaseAuth.instance.currentUser.uid)
-                                  .set({
-                                'id': 3,
-                                'email': FirebaseAuth.instance.currentUser.email,
-                                'First name': _firstNameController.text,
-                                'Last name': _lastNameController.text,
-                                'Address': _addressController.text,
-                                'Phone': _phoneController.text,
-                                'Pharmacy name': _pharmacyNameController.text,
-                                'Delivery': _delivery != null ? _delivery : _yesOrNo[0],
-                                'Work hours': _hours != null ? _hours : _yesOrNo[0],
-                                'Profile Image URL': _profileImageUrl != null
-                                    ? _profileImageUrl
-                                    : 'null'
+
+                              await uploadImage().then((value){
+
+                                ////////////////////////////////////////////////////////
+                                PharmacyDatabase().post(
+                                  FirebaseAuth.instance.currentUser.uid,
+                                  FirebaseAuth.instance.currentUser.email,
+                                  _addressController.text,
+                                  _pharmacyNameController.text,
+                                  _firstNameController.text,
+                                  _lastNameController.text,
+                                  _delivery != null ? _delivery : _yesOrNo[0],
+                                  _hours != null ? _hours : _yesOrNo[0],
+                                  _phoneController.text,
+                                  _profileImageUrl != null ? _profileImageUrl : 'null',
+                                );
+                                ////////////////////////////////////////////////////////
+
+                                FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(FirebaseAuth.instance.currentUser.uid)
+                                    .set({
+                                  'id': 3,
+                                  'email': FirebaseAuth.instance.currentUser.email,
+                                  'First name': _firstNameController.text,
+                                  'Last name': _lastNameController.text,
+                                  'Address': _addressController.text,
+                                  'Phone': _phoneController.text,
+                                  'Pharmacy name': _pharmacyNameController.text,
+                                  'Delivery': _delivery != null ? _delivery : _yesOrNo[0],
+                                  'Work hours': _hours != null ? _hours : _yesOrNo[0],
+                                  'Profile Image URL': _profileImageUrl != null
+                                      ? _profileImageUrl
+                                      : 'null'
+                                });
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => PharmacyHomeScreen()),
+                                );
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    Widgets().snakbar(
+                                        text: 'تم انشاء الحساب بنجاح',
+                                        background: Pallet().green,
+                                        duration: 2));
+
                               });
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => PharmacyHomeScreen()),
-                              );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  Widgets().snakbar(
-                                      text: 'تم انشاء الحساب بنجاح',
-                                      background: Pallet().green,
-                                      duration: 2));
+
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   Widgets().snakbar(
