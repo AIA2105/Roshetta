@@ -1,8 +1,21 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:io';
+import 'dart:async';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
+import 'Doctor.dart';
 
 class DoctorDatabase {
+
+  Future<File> getImageFileFromAssets(String path,String tmp) async {
+    final byteData = await rootBundle.load(path);
+    String tempPath = (await getTemporaryDirectory()).path;
+    File file = File('$tempPath/$tmp');
+    await file.writeAsBytes(byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+    return file;
+  }
+
   post(
       String id,
       String email,
@@ -14,29 +27,39 @@ class DoctorDatabase {
       String hospital,
       String gender,
       String phoneNumber,
-      String profileImage) async {
-    var url = Uri.parse('http://roshetta1.pythonanywhere.com/doctor');
-    var body = json.encode({
-      "email": email,
-      "address": address,
-      "birthday": birthday,
-      "firstName": firstName,
-      "master": master,
-      "hospital": hospital,
-      "gender": gender,
-      "id": id,
-      "lastName": lastName,
-      "phoneNumber": phoneNumber,
-      "profileImage": profileImage,
-    });
+      File profileImage) async {
 
-    final response = await http.post(url,
-        headers: {HttpHeaders.CONTENT_TYPE: "application/json"}, body: body);
+    var pic;
+    File f = await getImageFileFromAssets('images/newDoctor.png','newDoctor.png');
+    //create multipart request for POST or PATCH method
+    var request = http.MultipartRequest("POST", Uri.parse("http://roshetta1.pythonanywhere.com/doctor"));
+    //add text fields
+    request.fields["email"]= email;
+    request.fields["address"]= address;
+    request.fields["birthday"]= birthday;
+    request.fields["firstName"]= firstName;
+    request.fields["gender"]= gender;
+    request.fields["id"]= id;
+    request.fields["lastName"]= lastName;
+    request.fields["phoneNumber"]= phoneNumber;
+    request.fields["master"]= master;
+    request.fields["hospital"]= hospital;
 
-    print('Post Status code: ${response.statusCode}');
-    print('Post Body: ${response.body}');
+    //create multipart using filepath, string or bytes
+    if(profileImage==null){
+      pic = await http.MultipartFile.fromPath("profileImage", f.path);
+    }else{
+      pic = await http.MultipartFile.fromPath("profileImage", profileImage.path);
+    }
 
-    return response.body;
+    //add multipart to request
+    request.files.add(pic);
+    var response = await request.send();
+
+    //Get the response from the server
+    var responseData = await response.stream.toBytes();
+    var responseString = String.fromCharCodes(responseData);
+    print(responseString);
   }
 
   delete(String id) async {
@@ -53,4 +76,18 @@ class DoctorDatabase {
 
     return response;
   }
+
+  Future<Doctor> get(String id) async {
+    var url = Uri.parse('http://roshetta1.pythonanywhere.com/doctor/id=$id');
+    var response = await http.get(url);
+    var doctorData = List<Doctor>();
+    if (response.statusCode == 200) {
+      var doctorJson = json.decode(utf8.decode(response.bodyBytes));
+      for (var json in doctorJson) {
+        doctorData.add(Doctor.fromJson(json));
+      }
+    }
+    return doctorData[0];
+  }
+
 }

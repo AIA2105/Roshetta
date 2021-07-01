@@ -19,6 +19,10 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController _emailcontroller = TextEditingController();
   TextEditingController _passwordcontroller = TextEditingController();
+  Widget login= Widgets().arabicText(
+      text: 'الدخول',
+      color: Pallet().white_R,
+      fontSize: Spaces().smallSize);
 
   @override
   Widget build(BuildContext context) {
@@ -150,16 +154,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                     color: Pallet().blue_R,
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: Widgets().arabicText(
-                                          text: 'الدخول',
-                                          color: Pallet().white_R,
-                                          fontSize: Spaces().smallSize),
+                                      child: login,
                                     ),
                                     onPressed: () async {
                                       LoginButton().login(
                                           context,
                                           _emailcontroller.text,
                                           _passwordcontroller.text);
+                                      if(_emailcontroller.text.isNotEmpty && _passwordcontroller.text.isNotEmpty){
+                                        setState(() {
+                                          login = CircularProgressIndicator(color: Pallet().white_R,);
+                                        });
+                                      }
                                     },
                                   ),
                                 ),

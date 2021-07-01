@@ -10,8 +10,8 @@ import 'package:roshetta/AI/AIScreen.dart';
 import '../Constants/Spaces.dart';
 import '../Widgets/Widgets.dart';
 
-
 class Camera extends StatefulWidget {
+
   @override
   _CameraState createState() => _CameraState();
 }
@@ -20,6 +20,14 @@ class _CameraState extends State<Camera> {
   File _image;
   final picker = ImagePicker();
   String finalResult;
+  Widget progress= Text(
+      'تحليل الصورة',
+      style: TextStyle(
+          color: Colors.white,
+          fontFamily: 'arabic',
+          fontSize: 22)
+  );
+
 
   Future getCamera() async {
     final pickedFile = await picker.getImage(source: ImageSource.camera);
@@ -31,17 +39,18 @@ class _CameraState extends State<Camera> {
 
   Future getGallery() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
-    setState(() {
+    setState((){
       _image = File(pickedFile.path);
-      print('Image: ${_image}');
+      print('Image: $_image');
       print('Image path: ${_image.path}');
       print('Image URI: ${_image.uri}');
-
     });
   }
 
   @override
   Widget build(BuildContext context) {
+
+
     return Scaffold(
       backgroundColor: Pallet().background_R,
       appBar:  AppBar(
@@ -84,7 +93,9 @@ class _CameraState extends State<Camera> {
                       ),
                     ],
                   )
+
                 : Image.file(_image),
+
           )),
           if (_image == null)
             Row(
@@ -117,23 +128,30 @@ class _CameraState extends State<Camera> {
                 width: double.infinity,
                 child: FlatButton(
                   onPressed: () async{
-                    String result= await AI().postPrescription(FirebaseAuth.instance.currentUser.uid, _image);
                     setState(() {
-                      finalResult= result;
+                      progress= CircularProgressIndicator(color: Pallet().white_R,);
+                    });
+                    String result= await AI().postPrescription(FirebaseAuth.instance.currentUser.uid, _image);
+                    finalResult= result;
+                    if(finalResult!='AI Server is Off'){
                       Navigator.pushReplacement(context,
                           MaterialPageRoute(builder: (context) => AIScreen(result: finalResult)));
-                    });
+                    }else{
+                      setState(() {
+                        progress=Text(
+                            'السيرفر غير متاح الآن',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: 'arabic',
+                                fontSize: 22)
+                        );
+                      });
+                    }
 
 
 
                   },
-                  child: Text(
-                      'تحليل الصورة',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'arabic',
-                          fontSize: 22)
-                  ),
+                  child: progress,
                   color: Pallet().red_R,
                   padding: EdgeInsets.all(15),
                 )),

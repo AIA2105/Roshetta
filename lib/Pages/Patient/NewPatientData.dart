@@ -10,8 +10,6 @@ import 'package:roshetta/Pages/Login%20System/LoginScreen.dart';
 import 'package:roshetta/Pages/Patient/PatientHomeScreen.dart';
 import 'package:roshetta/Widgets/InputField_R.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-
 import 'PatientDatabase.dart';
 
 class NewPatientData extends StatefulWidget {
@@ -33,10 +31,17 @@ class _NewPatientDataState extends State<NewPatientData> {
   List _states = ['أعزب', 'متزوج'];
   File _image;
   final picker = ImagePicker();
-  String _profileImageUrl;
+  Widget signUp=Text(
+    'تسجيل',
+    style: TextStyle(
+        color: Colors.white,
+        fontFamily: 'arabic',
+        fontSize: 20),
+  );
 
   Future pickImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
@@ -44,16 +49,6 @@ class _NewPatientDataState extends State<NewPatientData> {
     } else {
       print('No image selected.');
     }
-  }
-
-  Future uploadImage() async {
-    String filename = FirebaseAuth.instance.currentUser.uid;
-    Reference storageReference =
-    FirebaseStorage.instance.ref().child("Profile Photos/$filename");
-    final UploadTask uploadTask = storageReference.putFile(_image);
-    final TaskSnapshot downloadUrl = (await uploadTask);
-    _profileImageUrl = await downloadUrl.ref.getDownloadURL();
-    print('$_image uploaded!');
   }
 
 
@@ -69,10 +64,7 @@ class _NewPatientDataState extends State<NewPatientData> {
               size: Spaces().backButton,
             ),
             onPressed: () async {
-              var delData = await FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(FirebaseAuth.instance.currentUser.uid)
-                  .delete();
+              var delData = await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser.uid).delete();
               var delAuth = await FirebaseAuth.instance.currentUser.delete();
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) => LoginScreen()));
@@ -335,15 +327,10 @@ class _NewPatientDataState extends State<NewPatientData> {
                           color: Color(0xFF33CFE8),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              'تسجيل',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: 'arabic',
-                                  fontSize: 20),
-                            ),
+                            child: signUp,
                           ),
                           onPressed: () async {
+
                             if (_firstNamecontroller.text.isNotEmpty &&
                                 _lastNamecontroller.text.isNotEmpty &&
                                 _addresscontroller.text.isNotEmpty &&
@@ -352,9 +339,11 @@ class _NewPatientDataState extends State<NewPatientData> {
                                 _heightcontroller.text.isNotEmpty &&
                                 _weighthcontroller.text.isNotEmpty) {
 
-                              await uploadImage().then((value){
+                              setState(() {
+                                signUp= CircularProgressIndicator(color: Pallet().white_R,);
+                              });
                                 ////////////////////////////////////////////////////////
-                                PatientDatabase().post(
+                                await PatientDatabase().post(
                                     FirebaseAuth.instance.currentUser.email,
                                     _addresscontroller.text,
                                     _blood != null ? _blood : _bloods[0],
@@ -365,33 +354,11 @@ class _NewPatientDataState extends State<NewPatientData> {
                                     _heightcontroller.text,
                                     FirebaseAuth.instance.currentUser.uid,
                                     _phonecontroller.text,
-                                    _profileImageUrl != null ? _profileImageUrl : 'null',
+                                    _image != null ? _image : null,
                                     _state != null ? _state : _states[0],
                                     _weighthcontroller.text);
                                 ////////////////////////////////////////////////////////
 
-                                FirebaseFirestore.instance
-                                    .collection('users')
-                                    .doc(FirebaseAuth.instance.currentUser.uid)
-                                    .set({
-                                  'id': 1,
-                                  'email':
-                                  FirebaseAuth.instance.currentUser.email,
-                                  'First name': _firstNamecontroller.text,
-                                  'Last name': _lastNamecontroller.text,
-                                  'Address': _addresscontroller.text,
-                                  'Phone': _phonecontroller.text,
-                                  'Birthday': _birthday,
-                                  'Height': _heightcontroller.text,
-                                  'Weight': _weighthcontroller.text,
-                                  'State': _state != null ? _state : _states[0],
-                                  'Gender':
-                                  _gender != null ? _gender : _genders[0],
-                                  'Blood': _blood != null ? _blood : _bloods[0],
-                                  'Profile Image URL': _profileImageUrl != null
-                                      ? _profileImageUrl
-                                      : 'null'
-                                });
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
@@ -402,7 +369,6 @@ class _NewPatientDataState extends State<NewPatientData> {
                                         text: 'تم انشاء الحساب بنجاح',
                                         background: Pallet().green,
                                         duration: 2));
-                              });
 
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(

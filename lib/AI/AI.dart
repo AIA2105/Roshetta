@@ -21,7 +21,11 @@ class AI{
     var responseString = String.fromCharCodes(responseData);
     _finalResult= responseString;
     print(_finalResult);
-    return _finalResult;
+    if(!_finalResult.contains('Tunnel') && !_finalResult.contains('.ngrok.io not found')){
+      return _finalResult;
+    }else{
+      return 'AI Server is Off';
+    }
   }
 
 

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:roshetta/Constants/Pallet.dart';
@@ -5,11 +6,6 @@ import 'package:roshetta/Constants/Spaces.dart';
 import 'package:roshetta/Pages/Doctor/NewDoctorData.dart';
 import 'package:roshetta/Pages/Patient/NewPatientData.dart';
 import 'package:roshetta/Pages/Pharmacy/NewPharmacyData.dart';
-import 'package:roshetta/Widgets/Widgets.dart';
-import '../Doctor/DoctorHomeScreen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../Pharmacy/PharmacyHomeScreen.dart';
 import 'LoginScreen.dart';
 
 class ChooseNewUser extends StatefulWidget {
@@ -84,11 +80,11 @@ class _ChooseNewUserState extends State<ChooseNewUser> {
                           ),
                         ),
                         onPressed: () {
-                          print(user);
                           FirebaseFirestore.instance.collection('users').doc(user.user.uid).set({
                             'id': 1,
                             'email': user.user.email,
                           });
+                          print(user);
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
@@ -125,11 +121,11 @@ class _ChooseNewUserState extends State<ChooseNewUser> {
                           ),
                         ),
                         onPressed: () {
-                          print(user);
                           FirebaseFirestore.instance.collection('users').doc(user.user.uid).set({
                             'id': 2,
                             'email': user.user.email,
                           });
+                          print(user);
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
@@ -166,11 +162,11 @@ class _ChooseNewUserState extends State<ChooseNewUser> {
                           ),
                         ),
                         onPressed: () {
-                          print(user);
                           FirebaseFirestore.instance.collection('users').doc(user.user.uid).set({
                             'id': 3,
                             'email': user.user.email,
                           });
+                          print(user);
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(

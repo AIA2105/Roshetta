@@ -9,8 +9,6 @@ import 'package:roshetta/Constants/Spaces.dart';
 import 'package:roshetta/Pages/Login%20System/LoginScreen.dart';
 import 'package:roshetta/Widgets/InputField_R.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-
 import 'DoctorDatabase.dart';
 import 'DoctorHomeScreen.dart';
 
@@ -32,7 +30,14 @@ class _NewDoctorDataState extends State<NewDoctorData> {
   List _genders = ['ذكر', 'أنثى'];
   File _image;
   final picker = ImagePicker();
-  String _profileImageUrl;
+  Widget signUp=Text(
+    'تسجيل',
+    style: TextStyle(
+        color: Colors.white,
+        fontFamily: 'arabic',
+        fontSize: 20),
+  );
+
 
   Future pickImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
@@ -45,15 +50,6 @@ class _NewDoctorDataState extends State<NewDoctorData> {
     }
   }
 
-  Future uploadImage() async {
-    String filename = FirebaseAuth.instance.currentUser.uid;
-    Reference storageReference =
-    FirebaseStorage.instance.ref().child("Profile Photos/$filename");
-    final UploadTask uploadTask = storageReference.putFile(_image);
-    final TaskSnapshot downloadUrl = (await uploadTask);
-    _profileImageUrl = await downloadUrl.ref.getDownloadURL();
-    print('$_image uploaded!');
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,10 +63,7 @@ class _NewDoctorDataState extends State<NewDoctorData> {
               size: Spaces().backButton,
             ),
             onPressed: () async{
-              var delData = await FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(FirebaseAuth.instance.currentUser.uid)
-                  .delete();
+              var delData = await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser.uid).delete();
               var delAuth = await FirebaseAuth.instance.currentUser.delete();
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) => LoginScreen()));
@@ -296,13 +289,7 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                           color: Color(0xFF33CFE8),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              'تسجيل',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: 'arabic',
-                                  fontSize: 20),
-                            ),
+                            child: signUp,
                           ),
                           onPressed: () async {
 
@@ -314,9 +301,11 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                 _masterController.text.isNotEmpty &&
                                 _hospitalController.text.isNotEmpty) {
 
-                              await uploadImage().then((value){
+                              setState(() {
+                                signUp= CircularProgressIndicator(color: Pallet().white_R,);
+                              });
                                 ////////////////////////////////////////////////////////
-                                DoctorDatabase().post(
+                                await DoctorDatabase().post(
                                   FirebaseAuth.instance.currentUser.uid,
                                   FirebaseAuth.instance.currentUser.email,
                                   _addressController.text,
@@ -327,28 +316,10 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                   _hospitalController.text,
                                   _gender != null ? _gender : _genders[0],
                                   _phoneController.text,
-                                  _profileImageUrl != null ? _profileImageUrl : 'null',
+                                  _image != null ? _image : null,
                                 );
                                 ////////////////////////////////////////////////////////
 
-                                FirebaseFirestore.instance
-                                    .collection('users')
-                                    .doc(FirebaseAuth.instance.currentUser.uid)
-                                    .set({
-                                  'id': 2,
-                                  'email': FirebaseAuth.instance.currentUser.email,
-                                  'First name': _firstNameController.text,
-                                  'Last name': _lastNameController.text,
-                                  'Address': _addressController.text,
-                                  'Phone': _phoneController.text,
-                                  'Birthday': _birthday,
-                                  'Master': _masterController.text,
-                                  'Hospital': _hospitalController.text,
-                                  'Gender': _gender != null ? _gender : _genders[0],
-                                  'Profile Image URL': _profileImageUrl != null
-                                      ? _profileImageUrl
-                                      : 'null'
-                                });
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
@@ -359,7 +330,6 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                         text: 'تم انشاء الحساب بنجاح',
                                         background: Pallet().green,
                                         duration: 2));
-                              });
 
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
