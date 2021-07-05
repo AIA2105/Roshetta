@@ -62,6 +62,48 @@ class DoctorDatabase {
     print(responseString);
   }
 
+  update(
+      String id,
+      String email,
+      String address,
+      String firstName,
+      String lastName,
+      String birthday,
+      String master,
+      String hospital,
+      String gender,
+      String phoneNumber,
+      File profileImage) async {
+
+    var pic;
+    var request = http.MultipartRequest("PUT", Uri.parse("http://roshetta1.pythonanywhere.com/doctor/id=$id"));
+    //add text fields
+    request.fields["email"]= email;
+    request.fields["address"]= address;
+    request.fields["birthday"]= birthday;
+    request.fields["firstName"]= firstName;
+    request.fields["gender"]= gender;
+    request.fields["lastName"]= lastName;
+    request.fields["phoneNumber"]= phoneNumber;
+    request.fields["master"]= master;
+    request.fields["hospital"]= hospital;
+
+    //create multipart using filepath, string or bytes
+    pic = await http.MultipartFile.fromPath("profileImage", profileImage.path);
+
+    //add multipart to request
+    request.files.add(pic);
+    var response = await request.send();
+
+    //Get the response from the server
+    var responseData = await response.stream.toBytes();
+    var responseString = String.fromCharCodes(responseData);
+
+    print(response.statusCode);
+    print(responseString);
+    return responseString;
+  }
+
   delete(String id) async {
     var url = Uri.parse('http://roshetta1.pythonanywhere.com/doctors/id=$id');
     final http.Response response = await http.delete(
@@ -73,7 +115,6 @@ class DoctorDatabase {
 
     print('Delete Status code: ${response.statusCode}');
     print('Delete Body: ${response.body}');
-
     return response;
   }
 

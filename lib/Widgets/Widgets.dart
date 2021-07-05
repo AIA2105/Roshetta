@@ -68,7 +68,7 @@ class Widgets{
     );
   }
 
-  Widget datePicker(BuildContext context, Function function){
+  Widget datePicker(String hint,BuildContext context, Function function){
     return Column(
       children: [
         Container(
@@ -100,7 +100,8 @@ class Widgets{
                 const EdgeInsets.symmetric(vertical: 12),
                 fillColor: Pallet().white_R,
                 filled: true,
-                hintText: '',
+                hintText: hint,
+
                 border: new OutlineInputBorder(
                   borderRadius:
                   BorderRadius.circular(Spaces().circularBorder),

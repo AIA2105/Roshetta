@@ -9,7 +9,6 @@ import 'package:roshetta/Constants/Spaces.dart';
 import 'package:roshetta/Pages/Login%20System/LoginScreen.dart';
 import 'package:roshetta/Widgets/InputField_R.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 import 'PharmacyDatabase.dart';
 import 'PharmacyHomeScreen.dart';
@@ -294,7 +293,7 @@ class _NewPharmacyDataState extends State<NewPharmacyData> {
                                 signUp= CircularProgressIndicator(color: Pallet().white_R,);
                               });
                                 ////////////////////////////////////////////////////////
-                                await PharmacyDatabase().post(
+                                var res= await PharmacyDatabase().post(
                                   FirebaseAuth.instance.currentUser.uid,
                                   FirebaseAuth.instance.currentUser.email,
                                   _addressController.text,
@@ -308,6 +307,24 @@ class _NewPharmacyDataState extends State<NewPharmacyData> {
                                 );
                                 ////////////////////////////////////////////////////////
 
+                              if(res=='false'){
+                                setState(() {
+                                  signUp= Text(
+                                    'تسجيل',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontFamily: 'arabic',
+                                        fontSize: 20),
+                                  );
+                                });
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    Widgets().snakbar(
+                                        text: 'حدثت مشكلة برجاء المحاولة لاحقاََ',
+                                        background: Pallet().red_R,
+                                        duration: 2));
+
+                              }else{
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
@@ -318,8 +335,9 @@ class _NewPharmacyDataState extends State<NewPharmacyData> {
                                         text: 'تم انشاء الحساب بنجاح',
                                         background: Pallet().green,
                                         duration: 2));
+                              }
 
-                            } else {
+                            }else{
                               ScaffoldMessenger.of(context).showSnackBar(
                                   Widgets().snakbar(
                                       text: 'برجاء اكمال البيانات',

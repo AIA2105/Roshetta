@@ -1,12 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:roshetta/AI/camera.dart';
 import 'package:roshetta/Constants/Pallet.dart';
 import 'package:roshetta/Pages/Patient/PatientDatabase.dart';
 import 'package:roshetta/Widgets/DeleteAccount.dart';
+import 'package:roshetta/Widgets/EditAccount.dart';
 import 'package:roshetta/Widgets/ExitAccount.dart';
-import '../Login System/LoginScreen.dart';
 import 'Patient.dart';
 
 class PatientHomeScreen extends StatefulWidget {
@@ -112,6 +111,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        EditAccount(patient),
+                        SizedBox(height: 20,),
                         ExitAccount(),
                         SizedBox(height: 20,),
                         DeleteAccount(),

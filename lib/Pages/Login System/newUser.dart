@@ -7,7 +7,8 @@ import 'package:roshetta/Widgets/LoginButton.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
 
 class newUser extends StatefulWidget {
-  const newUser({Key key}) : super(key: key);
+  String email;
+  newUser(this.email);
 
   @override
   _newUserState createState() => _newUserState();
@@ -17,6 +18,12 @@ class _newUserState extends State<newUser> {
   TextEditingController _emailcontroller = TextEditingController();
   TextEditingController _passwordcontroller = TextEditingController();
   TextEditingController _passwordcontroller2 = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _emailcontroller.text=widget.email;
+  }
 
   @override
   Widget build(BuildContext context) {

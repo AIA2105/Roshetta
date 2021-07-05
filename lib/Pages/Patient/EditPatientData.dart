@@ -1,24 +1,30 @@
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:roshetta/Constants/Pallet.dart';
 import 'package:roshetta/Constants/Spaces.dart';
-import 'package:roshetta/Pages/Login%20System/LoginScreen.dart';
-import 'package:roshetta/Pages/Patient/PatientHomeScreen.dart';
+import 'package:roshetta/Pages/Patient/Patient.dart';
 import 'package:roshetta/Widgets/InputField_R.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
+import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart' as pathProvider;
 import 'PatientDatabase.dart';
+import 'PatientHomeScreen.dart';
 
-class NewPatientData extends StatefulWidget {
-  const NewPatientData({Key key}) : super(key: key);
+class EditPatientData extends StatefulWidget {
+  Patient patient;
+
+  EditPatientData(this.patient);
+
   @override
-  _NewPatientDataState createState() => _NewPatientDataState();
+  _EditPatientDataState createState() => _EditPatientDataState();
 }
 
-class _NewPatientDataState extends State<NewPatientData> {
+class _EditPatientDataState extends State<EditPatientData> {
+
   TextEditingController _firstNamecontroller = TextEditingController();
   TextEditingController _lastNamecontroller = TextEditingController();
   TextEditingController _addresscontroller = TextEditingController();
@@ -31,33 +37,67 @@ class _NewPatientDataState extends State<NewPatientData> {
   List _states = ['أعزب', 'متزوج'];
   File _image;
   final picker = ImagePicker();
-  Widget signUp=Text(
-    'تسجيل',
+  Widget editData=Text(
+    'تعديل',
     style: TextStyle(
         color: Colors.white,
         fontFamily: 'arabic',
         fontSize: 20),
   );
 
-  deleteAcc() async{
-    var delData = await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser.uid).delete();
-    var delAuth = await FirebaseAuth.instance.currentUser.delete();
-    print('Auth & data deleted');
-    print(FirebaseAuth.instance.currentUser);
+  Future<void> _download() async {
+    final _url= 'http://roshetta1.pythonanywhere.com/showprofileimage/${FirebaseAuth.instance.currentUser.uid}/${widget.patient.profileImage}';
+    final response = await http.get(Uri.parse(_url));
+
+    // Get the image name
+    final imageName = path.basename(_url);
+    // Get the document directory path
+    final appDir = await pathProvider.getApplicationDocumentsDirectory();
+
+    // This is the saved image path
+    // You can use it to display the saved image later.
+    final localPath = path.join(appDir.path, imageName);
+
+    // Downloading
+    final imageFile = File(localPath);
+    await imageFile.writeAsBytes(response.bodyBytes);
+
+    setState(() {
+      _image = imageFile;
+      print('Image from internet');
+    });
   }
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      _download();
+      _firstNamecontroller.text=widget.patient.firstName;
+      _lastNamecontroller.text=widget.patient.lastName;
+      _addresscontroller.text=widget.patient.address;
+      _phonecontroller.text=widget.patient.phoneNumber;
+      _weighthcontroller.text=widget.patient.weight;
+      _heightcontroller.text=widget.patient.height;
+      _birthday=widget.patient.dateOfBirth;
+      _gender=widget.patient.gender;
+      _state=widget.patient.state;
+      _blood=widget.patient.blood;
+    });
+  }
+
 
   Future pickImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
-
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
+        print('Image from gallery');
       });
     } else {
       print('No image selected.');
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -71,18 +111,14 @@ class _NewPatientDataState extends State<NewPatientData> {
               size: Spaces().backButton,
             ),
             onPressed: () async {
-              if(FirebaseAuth.instance.currentUser!=null){
-                await deleteAcc();
-              }
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()));
-            },
+              Navigator.pop(context);
+            }
           ),
           elevation: 0,
           centerTitle: true,
           backgroundColor: Pallet().background_R,
           title: Widgets().arabicText(
-              text: 'بيانات المريض',
+              text: 'تعديل بيانات المريض',
               fontSize: Spaces().bigTitleSize,
               color: Pallet().blue_R)),
       body: CustomScrollView(
@@ -93,7 +129,6 @@ class _NewPatientDataState extends State<NewPatientData> {
             child: Padding(
               padding: EdgeInsets.all(10),
               child: Column(
-                //mainAxisSize: MainAxisSize.min,
                 children: [
                   InkWell(
                     child: Padding(
@@ -101,46 +136,52 @@ class _NewPatientDataState extends State<NewPatientData> {
                         child: Column(
                           children: [
                             Stack(children: [
-                              _image != null
-                                  ? Padding(
-                                      padding: const EdgeInsets.only(bottom: 20),
-                                      child: CircleAvatar(
-                                        radius: 75,
-                                        backgroundColor: Pallet().blue_R,
-                                        child: CircleAvatar(
-                                            radius: 70,
-                                            backgroundColor: Pallet().white_R,
-                                            child: ClipOval(
-                                                child: Image.file(
-                                              _image,
-                                              height: 150,
-                                              width: 300,
-                                            ))),
-                                      ),
-                                    )
-                                  : Image.asset(
-                                      'images/newPatient.png',
-                                      height: 180,
-                                      width: 300,
-                                    ),
+                               Padding(
+                                padding: const EdgeInsets.only(bottom: 20),
+                                child: CircleAvatar(
+                                  radius: 75,
+                                  backgroundColor: Pallet().blue_R,
+                                  child: CircleAvatar(
+                                      radius: 70,
+                                      backgroundColor: Pallet().white_R,
+                                      child: ClipOval(
+                                          child: _image != null
+                                              ?Image.file(
+                                            _image,
+                                            height: 150,
+                                            width: 300,
+                                          ):Image.network(
+                                            'http://roshetta1.pythonanywhere.com/showprofileimage/${FirebaseAuth.instance.currentUser.uid}/${widget.patient.profileImage}',
+                                            height: 130,
+                                            width: 300,
+                                            loadingBuilder:(BuildContext context, Widget child,ImageChunkEvent loadingProgress) {
+                                              if (loadingProgress == null) return child;
+                                              return Center(
+                                                child: CircularProgressIndicator(color: Pallet().blue_R,),
+                                              );
+                                            },
+                                          ),
+                                      )),
+                                ),
+                              ),
                               Positioned.fill(
                                   bottom: 8,
                                   child: Align(
-                                    alignment: Alignment.bottomCenter,
-                                    child: Stack(
-                                      children: [
-                                        Icon(
-                                          Icons.circle,
-                                          size: 30,
-                                          color: Pallet().white_R,
-                                        ),
-                                        Icon(
-                                          Icons.add_circle,
-                                          size: 30,
-                                          color: Pallet().red_R,
-                                        ),
-                                      ],
-                                    )
+                                      alignment: Alignment.bottomCenter,
+                                      child: Stack(
+                                        children: [
+                                          Icon(
+                                            Icons.circle,
+                                            size: 30,
+                                            color: Pallet().white_R,
+                                          ),
+                                          Icon(
+                                            Icons.add_circle,
+                                            size: 30,
+                                            color: Pallet().red_R,
+                                          ),
+                                        ],
+                                      )
                                   )),
                             ]),
 
@@ -150,7 +191,8 @@ class _NewPatientDataState extends State<NewPatientData> {
                                 fontSize: 20)),
 
                           ],
-                        )),
+                        )
+                    ),
                     onTap: () {
                       pickImage();
                     },
@@ -180,8 +222,7 @@ class _NewPatientDataState extends State<NewPatientData> {
                                           color: Pallet().blue_R),
                                       icon: Widgets()
                                           .inputFieldPrefix(Icons.person),
-                                      textEditingController:
-                                          _lastNamecontroller,
+                                      textEditingController: _lastNamecontroller,
                                       textInputType: TextInputType.name,
                                       secure: false),
                                 ),
@@ -197,8 +238,7 @@ class _NewPatientDataState extends State<NewPatientData> {
                                           color: Pallet().blue_R),
                                       icon: Widgets()
                                           .inputFieldPrefix(Icons.person),
-                                      textEditingController:
-                                          _firstNamecontroller,
+                                      textEditingController: _firstNamecontroller,
                                       textInputType: TextInputType.name,
                                       secure: false),
                                 ),
@@ -265,13 +305,13 @@ class _NewPatientDataState extends State<NewPatientData> {
                                 flex: 2,
                                 child: Padding(
                                     padding:
-                                        EdgeInsets.only(left: 8, bottom: 8),
-                                    child: Widgets().datePicker('',context,
-                                        (DateTime value) {
-                                      _birthday =
+                                    EdgeInsets.only(left: 8, bottom: 8),
+                                    child: Widgets().datePicker(_birthday,context,
+                                            (DateTime value) {
+                                          _birthday =
                                           '${value.year}-${value.month}-${value.day}';
-                                      print(_birthday);
-                                    })),
+                                          print(_birthday);
+                                        })),
                               ),
                             ],
                           ),
@@ -283,7 +323,7 @@ class _NewPatientDataState extends State<NewPatientData> {
                                   child: Widgets().dropDownButton(
                                       'ف. الدم', _blood, _bloods, (val) {
                                     setState(
-                                      () {
+                                          () {
                                         _blood = val;
                                       },
                                     );
@@ -296,7 +336,7 @@ class _NewPatientDataState extends State<NewPatientData> {
                                   child: Widgets().dropDownButton(
                                       'النوع', _gender, _genders, (val) {
                                     setState(
-                                      () {
+                                          () {
                                         _gender = val;
                                       },
                                     );
@@ -307,7 +347,7 @@ class _NewPatientDataState extends State<NewPatientData> {
                                 child: Widgets().dropDownButton(
                                     'الحالة', _state, _states, (val) {
                                   setState(
-                                    () {
+                                        () {
                                       _state = val;
                                     },
                                   );
@@ -321,11 +361,11 @@ class _NewPatientDataState extends State<NewPatientData> {
                   ),
                   Expanded(
                       child: SizedBox(
-                    height: 50,
-                  )),
+                        height: 50,
+                      )),
                   Padding(
                     padding:
-                        const EdgeInsets.only(left: 5, right: 5, bottom: 50),
+                    const EdgeInsets.only(left: 5, right: 5, bottom: 50),
                     child: ButtonTheme(
                       minWidth: double.maxFinite,
                       child: RaisedButton(
@@ -334,7 +374,7 @@ class _NewPatientDataState extends State<NewPatientData> {
                           color: Color(0xFF33CFE8),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: signUp,
+                            child: editData,
                           ),
                           onPressed: () async {
 
@@ -347,31 +387,31 @@ class _NewPatientDataState extends State<NewPatientData> {
                                 _weighthcontroller.text.isNotEmpty) {
 
                               setState(() {
-                                signUp= CircularProgressIndicator(color: Pallet().white_R,);
+                                editData= CircularProgressIndicator(color: Pallet().white_R,);
                               });
-                                ////////////////////////////////////////////////////////
-                                var res =await PatientDatabase().post(
-                                    FirebaseAuth.instance.currentUser.email,
-                                    _addresscontroller.text,
-                                    _blood != null ? _blood : _bloods[0],
-                                    _birthday,
-                                    _firstNamecontroller.text,
-                                    _lastNamecontroller.text,
-                                    _gender != null ? _gender : _genders[0],
-                                    _heightcontroller.text,
-                                    FirebaseAuth.instance.currentUser.uid,
-                                    _phonecontroller.text,
-                                    _image != null ? _image : null,
-                                    _state != null ? _state : _states[0],
-                                    _weighthcontroller.text);
-                                ////////////////////////////////////////////////////////
+                              ////////////////////////////////////////////////////////
+                              var res =await PatientDatabase().update(
+                                  FirebaseAuth.instance.currentUser.email,
+                                  _addresscontroller.text,
+                                  _blood,
+                                  _birthday,
+                                  _firstNamecontroller.text,
+                                  _lastNamecontroller.text,
+                                  _gender,
+                                  _heightcontroller.text,
+                                  FirebaseAuth.instance.currentUser.uid,
+                                  _phonecontroller.text,
+                                  _image,
+                                  _state,
+                                  _weighthcontroller.text);
+                              ////////////////////////////////////////////////////
 
-                              //print(res);
+                              print(res);
 
                               if(res=='false'){
                                 setState(() {
-                                  signUp= Text(
-                                    'تسجيل',
+                                  editData= Text(
+                                    'تعديل',
                                     style: TextStyle(
                                         color: Colors.white,
                                         fontFamily: 'arabic',
@@ -381,10 +421,10 @@ class _NewPatientDataState extends State<NewPatientData> {
 
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     Widgets().snakbar(
-                                        text: 'هذا الرقم موجود بالفعل',
+                                        text: 'حدثت مشكلة برجاء المحاولة لاحقاََ',
                                         background: Pallet().red_R,
                                         duration: 2));
-                                await deleteAcc();
+                            //
 
                               }else{
                                 Navigator.pushReplacement(
@@ -394,11 +434,11 @@ class _NewPatientDataState extends State<NewPatientData> {
                                 );
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     Widgets().snakbar(
-                                        text: 'تم انشاء الحساب بنجاح',
+                                        text: 'تم تعديل البيانات بنجاح',
                                         background: Pallet().green,
                                         duration: 2));
                               }
-
+                            //
                             }else{
                               ScaffoldMessenger.of(context).showSnackBar(
                                   Widgets().snakbar(
@@ -407,9 +447,9 @@ class _NewPatientDataState extends State<NewPatientData> {
                                       duration: 2));
                             }
                           }
-                          ////////////////////////////////////////////////////////
+                        ////////////////////////////////////////////////////////
 
-                          ),
+                      ),
                     ),
                   ),
                 ],

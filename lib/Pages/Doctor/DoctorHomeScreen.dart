@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:roshetta/Constants/Pallet.dart';
 import 'package:roshetta/Widgets/DeleteAccount.dart';
+import 'package:roshetta/Widgets/EditAccount.dart';
 import 'package:roshetta/Widgets/ExitAccount.dart';
 import '../Login System/LoginScreen.dart';
 import 'Doctor.dart';
@@ -101,6 +102,8 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        EditAccount(doctor),
+                        SizedBox(height: 20,),
                        ExitAccount(),
                         SizedBox(height: 20,),
                         DeleteAccount(),

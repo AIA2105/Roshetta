@@ -1,25 +1,28 @@
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:roshetta/Constants/Pallet.dart';
 import 'package:roshetta/Constants/Spaces.dart';
-import 'package:roshetta/Pages/Login%20System/LoginScreen.dart';
 import 'package:roshetta/Widgets/InputField_R.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
+import 'Doctor.dart';
 import 'DoctorDatabase.dart';
 import 'DoctorHomeScreen.dart';
+import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart' as pathProvider;
 
-class NewDoctorData extends StatefulWidget {
-  const NewDoctorData({Key key}) : super(key: key);
+class EditDoctorData extends StatefulWidget {
+  Doctor doctor;
+  EditDoctorData(this.doctor);
 
   @override
-  _NewDoctorDataState createState() => _NewDoctorDataState();
+  _EditDoctorDataState createState() => _EditDoctorDataState();
 }
 
-class _NewDoctorDataState extends State<NewDoctorData> {
+class _EditDoctorDataState extends State<EditDoctorData> {
   TextEditingController _firstNameController = TextEditingController();
   TextEditingController _lastNameController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
@@ -30,20 +33,60 @@ class _NewDoctorDataState extends State<NewDoctorData> {
   List _genders = ['ذكر', 'أنثى'];
   File _image;
   final picker = ImagePicker();
-  Widget signUp=Text(
-    'تسجيل',
+  Widget editData=Text(
+    'تعديل',
     style: TextStyle(
         color: Colors.white,
         fontFamily: 'arabic',
         fontSize: 20),
   );
 
+  Future<void> _download() async {
+    final _url= 'http://roshetta1.pythonanywhere.com/showprofileimage/${FirebaseAuth.instance.currentUser.uid}/${widget.doctor.profileImage}';
+    final response = await http.get(Uri.parse(_url));
 
+    // Get the image name
+    final imageName = path.basename(_url);
+    // Get the document directory path
+    final appDir = await pathProvider.getApplicationDocumentsDirectory();
+
+    // This is the saved image path
+    // You can use it to display the saved image later.
+    final localPath = path.join(appDir.path, imageName);
+
+    // Downloading
+    final imageFile = File(localPath);
+    await imageFile.writeAsBytes(response.bodyBytes);
+
+    setState(() {
+      _image = imageFile;
+      print('Image from internet');
+    });
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      _download();
+      _firstNameController.text=widget.doctor.firstName;
+      _lastNameController.text=widget.doctor.lastName;
+      _addressController.text=widget.doctor.address;
+      _phoneController.text=widget.doctor.phoneNumber;
+      _masterController.text=widget.doctor.master;
+      _hospitalController.text=widget.doctor.hospital;
+      _birthday=widget.doctor.birthday;
+      _gender=widget.doctor.gender;
+    });
+  }
+  
   Future pickImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
+        print('Image from gallery');
       });
     } else {
       print('No image selected.');
@@ -57,24 +100,20 @@ class _NewDoctorDataState extends State<NewDoctorData> {
       backgroundColor: Pallet().background_R,
       appBar: AppBar(
           leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: Pallet().blue_R,
-              size: Spaces().backButton,
-            ),
-            onPressed: () async{
-              var delData = await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser.uid).delete();
-              var delAuth = await FirebaseAuth.instance.currentUser.delete();
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()));
-              print('Auth & data deleted');
-            }
+              icon: Icon(
+                Icons.arrow_back_ios,
+                color: Pallet().blue_R,
+                size: Spaces().backButton,
+              ),
+              onPressed: () async{
+                Navigator.pop(context);
+              }
           ),
           elevation: 0,
           centerTitle: true,
           backgroundColor: Pallet().background_R,
           title: Widgets().arabicText(
-              text: 'بيانات الطبيب',
+              text: 'تعديل بيانات الطبيب',
               fontSize: Spaces().bigTitleSize,
               color: Pallet().blue_R)),
       body: CustomScrollView(
@@ -93,8 +132,7 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                         child: Column(
                           children: [
                             Stack(children: [
-                              _image != null
-                                  ? Padding(
+                              Padding(
                                 padding: const EdgeInsets.only(bottom: 20),
                                 child: CircleAvatar(
                                   radius: 75,
@@ -103,17 +141,24 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                       radius: 70,
                                       backgroundColor: Pallet().white_R,
                                       child: ClipOval(
-                                          child: Image.file(
-                                            _image,
-                                            height: 150,
-                                            width: 300,
-                                          ))),
+                                        child: _image != null
+                                            ?Image.file(
+                                          _image,
+                                          height: 150,
+                                          width: 300,
+                                        ):Image.network(
+                                          'http://roshetta1.pythonanywhere.com/showprofileimage/${FirebaseAuth.instance.currentUser.uid}/${widget.doctor.profileImage}',
+                                          height: 130,
+                                          width: 300,
+                                          loadingBuilder:(BuildContext context, Widget child,ImageChunkEvent loadingProgress) {
+                                            if (loadingProgress == null) return child;
+                                            return Center(
+                                              child: CircularProgressIndicator(color: Pallet().blue_R,),
+                                            );
+                                          },
+                                        ),
+                                      )),
                                 ),
-                              )
-                                  : Image.asset(
-                                'images/newDoctor.png',
-                                height: 180,
-                                width: 300,
                               ),
                               Positioned.fill(
                                   bottom: 8,
@@ -142,7 +187,8 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                 fontSize: 20)),
 
                           ],
-                        )),
+                        )
+                    ),
                     onTap: () {
                       pickImage();
                     },
@@ -173,7 +219,7 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                       icon: Widgets()
                                           .inputFieldPrefix(Icons.person),
                                       textEditingController:
-                                          _lastNameController,
+                                      _lastNameController,
                                       textInputType: TextInputType.name,
                                       secure: false),
                                 ),
@@ -190,7 +236,7 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                       icon: Widgets()
                                           .inputFieldPrefix(Icons.person),
                                       textEditingController:
-                                          _firstNameController,
+                                      _firstNameController,
                                       textInputType: TextInputType.name,
                                       secure: false),
                                 ),
@@ -227,7 +273,7 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                   child: Widgets().dropDownButton(
                                       'النوع', _gender, _genders, (val) {
                                     setState(
-                                      () {
+                                          () {
                                         _gender = val;
                                       },
                                     );
@@ -238,13 +284,13 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                 flex: 2,
                                 child: Padding(
                                     padding:
-                                        EdgeInsets.only(left: 8, bottom: 8),
-                                    child: Widgets().datePicker('',context,
-                                        (DateTime value) {
-                                      _birthday =
+                                    EdgeInsets.only(left: 8, bottom: 8),
+                                    child: Widgets().datePicker(_birthday,context,
+                                            (DateTime value) {
+                                          _birthday =
                                           '${value.year}-${value.month}-${value.day}';
-                                      print(_birthday);
-                                    })),
+                                          print(_birthday);
+                                        })),
                               ),
                             ],
                           ),
@@ -276,11 +322,11 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                   ),
                   Expanded(
                       child: SizedBox(
-                    height: 50,
-                  )),
+                        height: 50,
+                      )),
                   Padding(
                     padding:
-                        const EdgeInsets.only(left: 5, right: 5, bottom: 50),
+                    const EdgeInsets.only(left: 5, right: 5, bottom: 50),
                     child: ButtonTheme(
                       minWidth: double.maxFinite,
                       child: RaisedButton(
@@ -289,10 +335,9 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                           color: Color(0xFF33CFE8),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: signUp,
+                            child: editData,
                           ),
                           onPressed: () async {
-
                             if (_firstNameController.text.isNotEmpty &&
                                 _lastNameController.text.isNotEmpty &&
                                 _addressController.text.isNotEmpty &&
@@ -302,28 +347,30 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                 _hospitalController.text.isNotEmpty) {
 
                               setState(() {
-                                signUp= CircularProgressIndicator(color: Pallet().white_R,);
+                                editData= CircularProgressIndicator(color: Pallet().white_R,);
                               });
-                                ////////////////////////////////////////////////////////
-                                var res= await DoctorDatabase().post(
-                                  FirebaseAuth.instance.currentUser.uid,
-                                  FirebaseAuth.instance.currentUser.email,
-                                  _addressController.text,
-                                  _firstNameController.text,
-                                  _lastNameController.text,
-                                  _birthday,
-                                  _masterController.text,
-                                  _hospitalController.text,
-                                  _gender != null ? _gender : _genders[0],
-                                  _phoneController.text,
-                                  _image != null ? _image : null,
-                                );
-                                ////////////////////////////////////////////////////////
+                              ////////////////////////////////////////////////////////
+                              var res= await DoctorDatabase().update(
+                                FirebaseAuth.instance.currentUser.uid,
+                                FirebaseAuth.instance.currentUser.email,
+                                _addressController.text,
+                                _firstNameController.text,
+                                _lastNameController.text,
+                                _birthday,
+                                _masterController.text,
+                                _hospitalController.text,
+                                _gender,
+                                _phoneController.text,
+                                _image,
+                              );
+                              ////////////////////////////////////////////////////////
+
+                              print(res);
 
                               if(res=='false'){
                                 setState(() {
-                                  signUp= Text(
-                                    'تسجيل',
+                                  editData= Text(
+                                    'تعديل',
                                     style: TextStyle(
                                         color: Colors.white,
                                         fontFamily: 'arabic',
@@ -336,6 +383,7 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                         text: 'حدثت مشكلة برجاء المحاولة لاحقاََ',
                                         background: Pallet().red_R,
                                         duration: 2));
+                                //
 
                               }else{
                                 Navigator.pushReplacement(
@@ -345,11 +393,11 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                 );
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     Widgets().snakbar(
-                                        text: 'تم انشاء الحساب بنجاح',
+                                        text: 'تم تعديل البيانات بنجاح',
                                         background: Pallet().green,
                                         duration: 2));
                               }
-
+                              //
                             }else{
                               ScaffoldMessenger.of(context).showSnackBar(
                                   Widgets().snakbar(
@@ -358,9 +406,9 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                       duration: 2));
                             }
                           }
-                          ////////////////////////////////////////////////////////
+                        ////////////////////////////////////////////////////////
 
-                          ),
+                      ),
                     ),
                   ),
                 ],

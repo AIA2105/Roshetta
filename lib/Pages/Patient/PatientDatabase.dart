@@ -64,7 +64,56 @@ class PatientDatabase {
     //Get the response from the server
     var responseData = await response.stream.toBytes();
     var responseString = String.fromCharCodes(responseData);
+
+    print(response.statusCode);
     print(responseString);
+    return responseString;
+  }
+
+  update(
+      String email,
+      String address,
+      String blood,
+      String dateOfBirth,
+      String firstName,
+      String lastName,
+      String gender,
+      String height,
+      String id,
+      String phoneNumber,
+      File profileImage,
+      String state,
+      String weight) async {
+
+    var pic;
+    var request = http.MultipartRequest("PUT", Uri.parse("http://roshetta1.pythonanywhere.com/patient/id=$id"));
+    //add text fields
+    request.fields["email"]= email;
+    request.fields["address"]= address;
+    request.fields["blood"]= blood;
+    request.fields["DOB"]= dateOfBirth;
+    request.fields["f_name"]= firstName;
+    request.fields["gender"]= gender;
+    request.fields["height"]= height;
+    request.fields["l_name"]= lastName;
+    request.fields["phoneNumber"]= phoneNumber;
+    request.fields["state"]= state;
+    request.fields["weight"]= weight;
+
+    //create multipart using filepath, string or bytes
+      pic = await http.MultipartFile.fromPath("profileImage", profileImage.path);
+
+    //add multipart to request
+    request.files.add(pic);
+    var response = await request.send();
+
+    //Get the response from the server
+    var responseData = await response.stream.toBytes();
+    var responseString = String.fromCharCodes(responseData);
+
+    print(response.statusCode);
+    print(responseString);
+    return responseString;
   }
 
 

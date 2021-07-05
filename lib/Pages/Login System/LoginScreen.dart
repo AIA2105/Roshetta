@@ -160,12 +160,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                       LoginButton().login(
                                           context,
                                           _emailcontroller.text,
-                                          _passwordcontroller.text);
-                                      if(_emailcontroller.text.isNotEmpty && _passwordcontroller.text.isNotEmpty){
-                                        setState(() {
-                                          login = CircularProgressIndicator(color: Pallet().white_R,);
-                                        });
-                                      }
+                                          _passwordcontroller.text).then((value) {
+                                        if(value){
+                                          setState(() {
+                                            login = CircularProgressIndicator(color: Pallet().white_R,);
+                                          });
+                                        }
+                                      });
                                     },
                                   ),
                                 ),
@@ -178,7 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => newUser()),
+                                            builder: (context) => newUser(_emailcontroller.text)),
                                       );
                                     },
                                     child: Text(

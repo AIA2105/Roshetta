@@ -7,49 +7,90 @@ import 'package:image_picker/image_picker.dart';
 import 'package:roshetta/Constants/Pallet.dart';
 import 'package:roshetta/Constants/Spaces.dart';
 import 'package:roshetta/Pages/Login%20System/LoginScreen.dart';
+import 'package:roshetta/Pages/Pharmacy/Pharmacy.dart';
 import 'package:roshetta/Widgets/InputField_R.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
-import 'DoctorDatabase.dart';
-import 'DoctorHomeScreen.dart';
+import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart' as pathProvider;
+import 'PharmacyDatabase.dart';
+import 'PharmacyHomeScreen.dart';
 
-class NewDoctorData extends StatefulWidget {
-  const NewDoctorData({Key key}) : super(key: key);
+class EditPharmacyData extends StatefulWidget {
+  Pharmacy pharmacy;
+  EditPharmacyData(this.pharmacy);
 
   @override
-  _NewDoctorDataState createState() => _NewDoctorDataState();
+  _EditPharmacyDataState createState() => _EditPharmacyDataState();
 }
 
-class _NewDoctorDataState extends State<NewDoctorData> {
+class _EditPharmacyDataState extends State<EditPharmacyData> {
   TextEditingController _firstNameController = TextEditingController();
   TextEditingController _lastNameController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   TextEditingController _phoneController = TextEditingController();
-  String _birthday, _gender;
-  TextEditingController _masterController = TextEditingController();
-  TextEditingController _hospitalController = TextEditingController();
-  List _genders = ['ذكر', 'أنثى'];
+  String _hours, _delivery;
+  TextEditingController _pharmacyNameController = TextEditingController();
+  List _yesOrNo = ['نعم', 'لا'];
   File _image;
   final picker = ImagePicker();
-  Widget signUp=Text(
-    'تسجيل',
+  Widget editData=Text(
+    'تعديل',
     style: TextStyle(
         color: Colors.white,
         fontFamily: 'arabic',
         fontSize: 20),
   );
 
+  Future<void> _download() async {
+    final _url= 'http://roshetta1.pythonanywhere.com/showprofileimage/${FirebaseAuth.instance.currentUser.uid}/${widget.pharmacy.profileImage}';
+    final response = await http.get(Uri.parse(_url));
 
+    // Get the image name
+    final imageName = path.basename(_url);
+    // Get the document directory path
+    final appDir = await pathProvider.getApplicationDocumentsDirectory();
+
+    // This is the saved image path
+    // You can use it to display the saved image later.
+    final localPath = path.join(appDir.path, imageName);
+
+    // Downloading
+    final imageFile = File(localPath);
+    await imageFile.writeAsBytes(response.bodyBytes);
+
+    setState(() {
+      _image = imageFile;
+      print('Image from internet');
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      _download();
+      _firstNameController.text=widget.pharmacy.firstName;
+      _lastNameController.text=widget.pharmacy.lastName;
+      _addressController.text=widget.pharmacy.address;
+      _phoneController.text=widget.pharmacy.phoneNumber;
+      _pharmacyNameController.text=widget.pharmacy.pharmacyName;
+      _hours=widget.pharmacy.workHours;
+      _delivery=widget.pharmacy.delivery;
+    });
+  }
+  
   Future pickImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
+        print('Image from gallery');
       });
     } else {
       print('No image selected.');
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -57,24 +98,20 @@ class _NewDoctorDataState extends State<NewDoctorData> {
       backgroundColor: Pallet().background_R,
       appBar: AppBar(
           leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: Pallet().blue_R,
-              size: Spaces().backButton,
-            ),
-            onPressed: () async{
-              var delData = await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser.uid).delete();
-              var delAuth = await FirebaseAuth.instance.currentUser.delete();
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()));
-              print('Auth & data deleted');
-            }
+              icon: Icon(
+                Icons.arrow_back_ios,
+                color: Pallet().blue_R,
+                size: Spaces().backButton,
+              ),
+              onPressed: () async{
+                Navigator.pop(context);
+              }
           ),
           elevation: 0,
           centerTitle: true,
           backgroundColor: Pallet().background_R,
           title: Widgets().arabicText(
-              text: 'بيانات الطبيب',
+              text: 'تعديل بيانات الصيدلي',
               fontSize: Spaces().bigTitleSize,
               color: Pallet().blue_R)),
       body: CustomScrollView(
@@ -93,8 +130,7 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                         child: Column(
                           children: [
                             Stack(children: [
-                              _image != null
-                                  ? Padding(
+                              Padding(
                                 padding: const EdgeInsets.only(bottom: 20),
                                 child: CircleAvatar(
                                   radius: 75,
@@ -103,17 +139,24 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                       radius: 70,
                                       backgroundColor: Pallet().white_R,
                                       child: ClipOval(
-                                          child: Image.file(
-                                            _image,
-                                            height: 150,
-                                            width: 300,
-                                          ))),
+                                        child: _image != null
+                                            ?Image.file(
+                                          _image,
+                                          height: 150,
+                                          width: 300,
+                                        ):Image.network(
+                                          'http://roshetta1.pythonanywhere.com/showprofileimage/${FirebaseAuth.instance.currentUser.uid}/${widget.pharmacy.profileImage}',
+                                          height: 130,
+                                          width: 300,
+                                          loadingBuilder:(BuildContext context, Widget child,ImageChunkEvent loadingProgress) {
+                                            if (loadingProgress == null) return child;
+                                            return Center(
+                                              child: CircularProgressIndicator(color: Pallet().blue_R,),
+                                            );
+                                          },
+                                        ),
+                                      )),
                                 ),
-                              )
-                                  : Image.asset(
-                                'images/newDoctor.png',
-                                height: 180,
-                                width: 300,
                               ),
                               Positioned.fill(
                                   bottom: 8,
@@ -142,7 +185,8 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                 fontSize: 20)),
 
                           ],
-                        )),
+                        )
+                    ),
                     onTap: () {
                       pickImage();
                     },
@@ -173,7 +217,7 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                       icon: Widgets()
                                           .inputFieldPrefix(Icons.person),
                                       textEditingController:
-                                          _lastNameController,
+                                      _lastNameController,
                                       textInputType: TextInputType.name,
                                       secure: false),
                                 ),
@@ -190,12 +234,22 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                       icon: Widgets()
                                           .inputFieldPrefix(Icons.person),
                                       textEditingController:
-                                          _firstNameController,
+                                      _firstNameController,
                                       textInputType: TextInputType.name,
                                       secure: false),
                                 ),
                               ),
                             ],
+                          ),
+                          InputField_R(
+                            title: Widgets().arabicText(
+                                text: 'اسم الصيدلية',
+                                fontSize: Spaces().smallSize,
+                                color: Pallet().blue_R),
+                            textAlign: TextAlign.right,
+                            textEditingController: _pharmacyNameController,
+                            textInputType: TextInputType.text,
+                            secure: false,
                           ),
                           InputField_R(
                               textAlign: TextAlign.right,
@@ -225,49 +279,31 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                 child: Padding(
                                   padding: EdgeInsets.only(right: 8, bottom: 8),
                                   child: Widgets().dropDownButton(
-                                      'النوع', _gender, _genders, (val) {
+                                      'خدمة توصيل', _delivery, _yesOrNo, (val) {
                                     setState(
-                                      () {
-                                        _gender = val;
+                                          () {
+                                        _delivery = val;
                                       },
                                     );
                                   }),
                                 ),
                               ),
-                              Expanded(
-                                flex: 2,
-                                child: Padding(
-                                    padding:
-                                        EdgeInsets.only(left: 8, bottom: 8),
-                                    child: Widgets().datePicker('',context,
-                                        (DateTime value) {
-                                      _birthday =
-                                          '${value.year}-${value.month}-${value.day}';
-                                      print(_birthday);
-                                    })),
-                              ),
-                            ],
-                          ),
 
-                          InputField_R(
-                            title: Widgets().arabicText(
-                                text: 'التخصص',
-                                fontSize: Spaces().smallSize,
-                                color: Pallet().blue_R),
-                            textAlign: TextAlign.right,
-                            textEditingController: _masterController,
-                            textInputType: TextInputType.text,
-                            secure: false,
-                          ),
-                          InputField_R(
-                            title: Widgets().arabicText(
-                                text: 'المستشفى/ العيادة',
-                                fontSize: Spaces().smallSize,
-                                color: Pallet().blue_R),
-                            textAlign: TextAlign.right,
-                            textEditingController: _hospitalController,
-                            textInputType: TextInputType.text,
-                            secure: false,
+                              Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.only(right: 8, bottom: 8),
+                                  child: Widgets().dropDownButton(
+                                      'نعمل 24/7', _hours, _yesOrNo, (val) {
+                                    setState(
+                                          () {
+                                        _hours = val;
+                                      },
+                                    );
+                                  }),
+                                ),
+                              ),
+
+                            ],
                           ),
 
                         ],
@@ -276,11 +312,11 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                   ),
                   Expanded(
                       child: SizedBox(
-                    height: 50,
-                  )),
+                        height: 50,
+                      )),
                   Padding(
                     padding:
-                        const EdgeInsets.only(left: 5, right: 5, bottom: 50),
+                    const EdgeInsets.only(left: 5, right: 5, bottom: 50),
                     child: ButtonTheme(
                       minWidth: double.maxFinite,
                       child: RaisedButton(
@@ -289,41 +325,39 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                           color: Color(0xFF33CFE8),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: signUp,
+                            child: editData,
                           ),
                           onPressed: () async {
-
+                            ////////////////////////////////////////////////////////
                             if (_firstNameController.text.isNotEmpty &&
                                 _lastNameController.text.isNotEmpty &&
                                 _addressController.text.isNotEmpty &&
                                 _phoneController.text.isNotEmpty &&
-                                _birthday.isNotEmpty &&
-                                _masterController.text.isNotEmpty &&
-                                _hospitalController.text.isNotEmpty) {
+                                _pharmacyNameController.text.isNotEmpty) {
 
                               setState(() {
-                                signUp= CircularProgressIndicator(color: Pallet().white_R,);
+                                editData= CircularProgressIndicator(color: Pallet().white_R,);
                               });
-                                ////////////////////////////////////////////////////////
-                                var res= await DoctorDatabase().post(
-                                  FirebaseAuth.instance.currentUser.uid,
-                                  FirebaseAuth.instance.currentUser.email,
-                                  _addressController.text,
-                                  _firstNameController.text,
-                                  _lastNameController.text,
-                                  _birthday,
-                                  _masterController.text,
-                                  _hospitalController.text,
-                                  _gender != null ? _gender : _genders[0],
-                                  _phoneController.text,
-                                  _image != null ? _image : null,
-                                );
-                                ////////////////////////////////////////////////////////
+                              ////////////////////////////////////////////////////////
+                              var res= await PharmacyDatabase().update(
+                                FirebaseAuth.instance.currentUser.uid,
+                                FirebaseAuth.instance.currentUser.email,
+                                _addressController.text,
+                                _pharmacyNameController.text,
+                                _firstNameController.text,
+                                _lastNameController.text,
+                                _delivery,
+                                _hours,
+                                _phoneController.text,
+                                _image,
+                              );
+                              ////////////////////////////////////////////////////////
+                              print(res);
 
                               if(res=='false'){
                                 setState(() {
-                                  signUp= Text(
-                                    'تسجيل',
+                                  editData= Text(
+                                    'تعديل',
                                     style: TextStyle(
                                         color: Colors.white,
                                         fontFamily: 'arabic',
@@ -336,20 +370,21 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                         text: 'حدثت مشكلة برجاء المحاولة لاحقاََ',
                                         background: Pallet().red_R,
                                         duration: 2));
+                                //
 
                               }else{
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => DoctorHomeScreen()),
+                                      builder: (context) => PharmacyHomeScreen()),
                                 );
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     Widgets().snakbar(
-                                        text: 'تم انشاء الحساب بنجاح',
+                                        text: 'تم تعديل البيانات بنجاح',
                                         background: Pallet().green,
                                         duration: 2));
                               }
-
+                              //
                             }else{
                               ScaffoldMessenger.of(context).showSnackBar(
                                   Widgets().snakbar(
@@ -358,9 +393,9 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                       duration: 2));
                             }
                           }
-                          ////////////////////////////////////////////////////////
+                        ////////////////////////////////////////////////////////
 
-                          ),
+                      ),
                     ),
                   ),
                 ],

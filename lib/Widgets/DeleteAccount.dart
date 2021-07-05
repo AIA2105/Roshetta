@@ -14,6 +14,12 @@ class DeleteAccount extends StatefulWidget {
 }
 
 class _DeleteAccountState extends State<DeleteAccount> {
+  var user;
+  @override
+  void initState(){
+    user= FirebaseAuth.instance.currentUser;
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return FlatButton(
@@ -25,6 +31,7 @@ class _DeleteAccountState extends State<DeleteAccount> {
               titlePadding: EdgeInsets.only(right: 40,left: 30,top: 10),
               title: Text(
                 'متأكد من رغبتك في حذف الحساب؟',
+                textDirection: TextDirection.rtl,
                 style: TextStyle(
                     color: Pallet().red_R,
                     fontFamily: 'arabic',
@@ -53,10 +60,9 @@ class _DeleteAccountState extends State<DeleteAccount> {
                         fontSize: 16),
                   ),
                   onPressed:  () async{
-                    var user= FirebaseAuth.instance.currentUser;
                     DoctorDatabase().delete(user.uid);
                     await FirebaseFirestore.instance.collection('users').doc(user.uid).delete();
-                    await user.delete();
+                    await FirebaseAuth.instance.currentUser.delete();
                     Navigator.pushReplacement(context,
                         MaterialPageRoute(builder: (context) => LoginScreen()));
                     print('Auth & data deleted');

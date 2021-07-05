@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:roshetta/AI/camera.dart';
 import 'package:roshetta/Constants/Pallet.dart';
 import 'package:roshetta/Widgets/DeleteAccount.dart';
+import 'package:roshetta/Widgets/EditAccount.dart';
 import 'package:roshetta/Widgets/ExitAccount.dart';
 import '../Login System/LoginScreen.dart';
 import 'Pharmacy.dart';
@@ -112,6 +113,8 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        EditAccount(pharmacy),
+                        SizedBox(height: 20,),
                         ExitAccount(),
                         SizedBox(height: 20,),
                         DeleteAccount(),

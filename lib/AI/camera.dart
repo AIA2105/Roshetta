@@ -1,4 +1,4 @@
-
+import 'package:image_cropper/image_cropper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -28,23 +28,43 @@ class _CameraState extends State<Camera> {
           fontSize: 22)
   );
 
-
   Future getCamera() async {
     final pickedFile = await picker.getImage(source: ImageSource.camera);
+    _image = File(pickedFile.path);
+    cropImage();
 
-    setState(() {
-      _image = File(pickedFile.path);
-    });
   }
 
   Future getGallery() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
-    setState((){
-      _image = File(pickedFile.path);
-      print('Image: $_image');
-      print('Image path: ${_image.path}');
-      print('Image URI: ${_image.uri}');
-    });
+    _image = File(pickedFile.path);
+    cropImage();
+  }
+
+  cropImage() async {
+    File croppedFile = await ImageCropper.cropImage(
+        sourcePath: _image.path,
+        aspectRatioPresets: [
+          CropAspectRatioPreset.square,
+          CropAspectRatioPreset.ratio3x2,
+          CropAspectRatioPreset.original,
+          CropAspectRatioPreset.ratio4x3,
+          CropAspectRatioPreset.ratio16x9,
+        ],
+        androidUiSettings: AndroidUiSettings(
+          lockAspectRatio: false,
+          toolbarTitle: 'قص السطر المراد تحليله',
+          toolbarColor: Pallet().blue_R,
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset.ratio16x9,
+          activeControlsWidgetColor: Pallet().red_R,
+          backgroundColor: Pallet().white_R,
+        ));
+    if (croppedFile != null) {
+      setState(() {
+        _image = croppedFile;
+      });
+    }
   }
 
   @override

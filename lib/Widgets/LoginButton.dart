@@ -11,9 +11,9 @@ import 'package:roshetta/Widgets/Widgets.dart';
 
 class LoginButton {
 
-  void login(BuildContext context, String email, String password) async {
+   Future<bool> login(BuildContext context, String email, String password) async {
     print('try to login');
-    print('email:${email}, password: $password');
+    print('email:$email, password: $password');
     if (email.isNotEmpty && password.isNotEmpty) {
       try {
         var result = await FirebaseAuth.instance
@@ -46,6 +46,8 @@ class LoginButton {
             }
           });
         }
+        return true;
+
       } on FirebaseAuthException catch (e) {
         if (e.code != null) {
           print('erooooooooooooor');
@@ -54,6 +56,7 @@ class LoginButton {
               background: Pallet().red_R,
               duration: 2
           ));
+          return false;
         }
       }
     } else {
@@ -62,6 +65,7 @@ class LoginButton {
           background: Pallet().red_R,
           duration: 2
       ));
+      return false;
     }
   }
 
