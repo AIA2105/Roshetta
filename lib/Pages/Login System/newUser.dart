@@ -2,8 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:roshetta/Constants/Pallet.dart';
 import 'package:roshetta/Constants/Spaces.dart';
+import 'package:roshetta/Constants/Strings.dart';
 import 'package:roshetta/Widgets/InputField_R.dart';
-import 'package:roshetta/Widgets/LoginButton.dart';
+import 'package:roshetta/Widgets/AccountButtons.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
 
 class newUser extends StatefulWidget {
@@ -28,23 +29,17 @@ class _newUserState extends State<newUser> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF5F5F5),
+      backgroundColor:Pallet().background_R,
       appBar: AppBar(
           leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: Pallet().blue_R,
-              size: Spaces().backButton,
-            ),
+            icon: Widgets().backArrowIcon(),
             onPressed: () => Navigator.of(context).pop(),
           ),
           elevation: 0,
           centerTitle: true,
           backgroundColor: Pallet().background_R,
-          title: Widgets().arabicText(
-              text: 'مستخدم جديد',
-              fontSize: Spaces().bigTitleSize,
-              color: Pallet().blue_R)),
+          title: Widgets().screenTitle('مستخدم جديد',Pallet().blue_R)
+    ),
       body: CustomScrollView(reverse: true, slivers: [
         SliverFillRemaining(
           hasScrollBody: false,
@@ -96,7 +91,7 @@ class _newUserState extends State<newUser> {
 
                 Expanded(
                     child: SizedBox(
-                  height: 20,
+                  height: Spaces().mediumSize,
                 )),
 
                 Padding(
@@ -109,20 +104,18 @@ class _newUserState extends State<newUser> {
                       color: Color(0xFF33CFE8),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          'متابعة',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: 'arabic',
-                              fontSize: 20),
+                        child: Widgets().arabicText(
+                            text: 'متابعة',
+                            fontSize: Spaces().mediumSize,
+                            color: Pallet().white_R
                         ),
                       ),
                       onPressed: () async {
                         if(_passwordcontroller.text==_passwordcontroller2.text){
-                          LoginButton().newUser(context, _emailcontroller.text,
+                          AccountButtons().newUser(context, _emailcontroller.text,
                               _passwordcontroller.text);
                         }else{
-                          ScaffoldMessenger.of(context).showSnackBar(Widgets().snakbar(
+                          ScaffoldMessenger.of(context).showSnackBar(Widgets().snakBar(
                               text: 'كلمة المرور غير متطابقة',
                               background: Pallet().red_R,
                               duration: 2

@@ -1,10 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:roshetta/Constants/Pallet.dart';
-import 'package:roshetta/Pages/Doctor/DoctorDatabase.dart';
+import 'package:roshetta/Constants/Spaces.dart';
+import 'package:roshetta/Constants/Strings.dart';
 import 'package:roshetta/Pages/Login%20System/LoginScreen.dart';
+
+import 'Widgets.dart';
 
 class ExitAccount extends StatefulWidget {
   const ExitAccount({Key key}) : super(key: key);
@@ -28,30 +30,26 @@ class _ExitAccountState extends State<ExitAccount> {
                 textDirection: TextDirection.rtl,
                 style: TextStyle(
                     color: Pallet().red_R,
-                    fontFamily: 'arabic',
+                    fontFamily: Strings().arabicFontFamily,
                     fontWeight: FontWeight.bold,
-                    fontSize: 20),
+                    fontSize: Spaces().mediumSize),
               ),
               actions: [
                 FlatButton(
-                  child: Text(
-                    'الغاء العملية',
-                    style: TextStyle(
-                        color: Pallet().blue_R,
-                        fontFamily: 'arabic',
-                        fontSize: 16),
+                  child: Widgets().arabicText(
+                    text: 'الغاء العملية',
+                    fontSize: 16,
+                    color: Pallet().blue_R,
                   ),
                   onPressed:  (){
                     Navigator.pop(context);
                   },
                 ),
                 FlatButton(
-                  child: Text(
-                    'تسجيل الخروج',
-                    style: TextStyle(
-                        color: Color(0xFFC63C22),
-                        fontFamily: 'arabic',
-                        fontSize: 16),
+                  child: Widgets().arabicText(
+                    text: 'تسجيل الخروج',
+                    fontSize: 16,
+                    color: Pallet().red_R,
                   ),
                   onPressed:  () async{
                     var user= FirebaseAuth.instance.currentUser;
@@ -68,12 +66,10 @@ class _ExitAccountState extends State<ExitAccount> {
         );
 
       },
-      child: Text(
-        'تسجيل الخروج',
-        style: TextStyle(
-            color: Color(0xFFC63C22),
-            fontFamily: 'arabic',
-            fontSize: 20),
+      child: Widgets().arabicText(
+        text: 'تسجيل الخروج',
+        fontSize: Spaces().mediumSize,
+        color: Pallet().red_R,
       ),
     );
   }

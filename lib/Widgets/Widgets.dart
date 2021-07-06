@@ -1,7 +1,9 @@
 import 'package:date_field/date_field.dart';
 import 'package:flutter/material.dart';
+import 'package:roshetta/Constants/Links.dart';
 import 'package:roshetta/Constants/Pallet.dart';
 import 'package:roshetta/Constants/Spaces.dart';
+import 'package:roshetta/Constants/Strings.dart';
 
 class Widgets{
 
@@ -11,7 +13,7 @@ class Widgets{
       textDirection: textDirection!=null?textDirection:TextDirection.rtl,
       style: TextStyle(
           color: color,
-          fontFamily: 'arabic',
+          fontFamily: Strings().arabicFontFamily,
           fontSize: fontSize),
     );
   }
@@ -48,26 +50,22 @@ class Widgets{
   Widget inputFieldPrefix(icon){
     return Icon(
       icon,
-      color: Color(0xFF33CFE8),
-      size: 20,
+      color: Pallet().blue_R,
+      size: Spaces().mediumSize,
     );
   }
-
-  Widget snakbar({String text, Color background, int duration}){
+  Widget snakBar({String text, Color background, int duration}){
     return SnackBar(
-      content: Text(
-        text,
-        textDirection: TextDirection.rtl,
-        style: TextStyle(
-            color: Colors.white,
-            fontFamily: 'arabic',
-            fontSize: Spaces().smallestSize),
+      content: Widgets().arabicText(
+        text: text,
+        fontSize: Spaces().smallSize,
+        color: Pallet().white_R,
+        textDirection: TextDirection.rtl
       ),
       backgroundColor: background,
       duration: Duration(seconds: duration),
     );
   }
-
   Widget datePicker(String hint,BuildContext context, Function function){
     return Column(
       children: [
@@ -121,7 +119,6 @@ class Widgets{
       ],
     );
   }
-
   Widget dropDownButton(String title, String hint, List values, Function function){
     return Column(
       children: [
@@ -177,6 +174,46 @@ class Widgets{
           onChanged: function,
         ),
       ],
+    );
+  }
+  Widget profilePicture(String userID, String profileImage){
+    return Padding(
+        padding: const EdgeInsets.all(20),
+        child: CircleAvatar(
+          radius: 75,
+          backgroundColor: Pallet().blue_R,
+          child: CircleAvatar(
+              radius: 70,
+              backgroundColor: Pallet().white_R,
+              child: ClipOval(
+                  child: Image.network(
+                    '${Links().profileImage}/$userID/$profileImage',
+                    height: 130,
+                    width: 300,
+                    loadingBuilder:(BuildContext context, Widget child,ImageChunkEvent loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(color: Pallet().blue_R,),
+                      );
+                    },
+                  )
+              )
+          ),
+        )
+    );
+}
+  Widget backArrowIcon(){
+    return Icon(
+      Icons.arrow_back_ios,
+      color: Pallet().blue_R,
+      size: Spaces().backButton,
+    );
+  }
+  Widget screenTitle(String title,Color color){
+    return Widgets().arabicText(
+        text: title,
+        fontSize: Spaces().bigTitleSize,
+        color: color
     );
   }
 

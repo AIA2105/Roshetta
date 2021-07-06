@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:roshetta/Constants/Pallet.dart';
 import 'package:roshetta/Constants/Spaces.dart';
+import 'package:roshetta/Constants/Strings.dart';
 import 'package:roshetta/Pages/Login%20System/LoginScreen.dart';
 import 'package:roshetta/Widgets/InputField_R.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
@@ -30,14 +31,11 @@ class _NewDoctorDataState extends State<NewDoctorData> {
   List _genders = ['ذكر', 'أنثى'];
   File _image;
   final picker = ImagePicker();
-  Widget signUp=Text(
-    'تسجيل',
-    style: TextStyle(
-        color: Colors.white,
-        fontFamily: 'arabic',
-        fontSize: 20),
+  Widget signUp=Widgets().arabicText(
+    text: 'تسجيل',
+    fontSize: Spaces().mediumSize,
+    color: Pallet().white_R,
   );
-
 
   Future pickImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
@@ -57,13 +55,9 @@ class _NewDoctorDataState extends State<NewDoctorData> {
       backgroundColor: Pallet().background_R,
       appBar: AppBar(
           leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: Pallet().blue_R,
-              size: Spaces().backButton,
-            ),
+            icon: Widgets().backArrowIcon(),
             onPressed: () async{
-              var delData = await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser.uid).delete();
+              var delData = await FirebaseFirestore.instance.collection(Strings().fireStoreTableName).doc(FirebaseAuth.instance.currentUser.uid).delete();
               var delAuth = await FirebaseAuth.instance.currentUser.delete();
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) => LoginScreen()));
@@ -73,10 +67,8 @@ class _NewDoctorDataState extends State<NewDoctorData> {
           elevation: 0,
           centerTitle: true,
           backgroundColor: Pallet().background_R,
-          title: Widgets().arabicText(
-              text: 'بيانات الطبيب',
-              fontSize: Spaces().bigTitleSize,
-              color: Pallet().blue_R)),
+          title: Widgets().screenTitle('بيانات الطبيب',Pallet().blue_R)
+      ),
       body: CustomScrollView(
         //reverse: true,
         slivers: [
@@ -136,10 +128,11 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                   )),
                             ]),
 
-                            Text('الصورة الشخصية', style: TextStyle(
-                                color:Pallet().red_R,
-                                fontFamily: 'arabic',
-                                fontSize: 20)),
+                            Widgets().arabicText(
+                              text: 'الصورة الشخصية',
+                              fontSize: Spaces().mediumSize,
+                              color: Pallet().red_R,
+                            ),
 
                           ],
                         )),
@@ -150,7 +143,7 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                   Card(
                     shape: RoundedRectangleBorder(
                       side: BorderSide(color: Pallet().white_R, width: 1),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(Spaces().mediumSize),
                     ),
                     elevation: 10,
                     color: Pallet().white_R.withOpacity(0.8),
@@ -322,17 +315,15 @@ class _NewDoctorDataState extends State<NewDoctorData> {
 
                               if(res=='false'){
                                 setState(() {
-                                  signUp= Text(
-                                    'تسجيل',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontFamily: 'arabic',
-                                        fontSize: 20),
+                                  signUp= Widgets().arabicText(
+                                    text: 'تسجيل',
+                                    fontSize: Spaces().mediumSize,
+                                    color: Pallet().white_R,
                                   );
                                 });
 
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                    Widgets().snakbar(
+                                    Widgets().snakBar(
                                         text: 'حدثت مشكلة برجاء المحاولة لاحقاََ',
                                         background: Pallet().red_R,
                                         duration: 2));
@@ -344,7 +335,7 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                       builder: (context) => DoctorHomeScreen()),
                                 );
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                    Widgets().snakbar(
+                                    Widgets().snakBar(
                                         text: 'تم انشاء الحساب بنجاح',
                                         background: Pallet().green,
                                         duration: 2));
@@ -352,7 +343,7 @@ class _NewDoctorDataState extends State<NewDoctorData> {
 
                             }else{
                               ScaffoldMessenger.of(context).showSnackBar(
-                                  Widgets().snakbar(
+                                  Widgets().snakBar(
                                       text: 'برجاء اكمال البيانات',
                                       background: Pallet().red_R,
                                       duration: 2));

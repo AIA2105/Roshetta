@@ -2,8 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:roshetta/Constants/Pallet.dart';
 import 'package:roshetta/Constants/Spaces.dart';
+import 'package:roshetta/Constants/Strings.dart';
 import 'package:roshetta/Widgets/InputField_R.dart';
-import 'package:roshetta/Widgets/LoginButton.dart';
+import 'package:roshetta/Widgets/AccountButtons.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
 
 class ForgetPassword extends StatefulWidget {
@@ -22,20 +23,14 @@ class _ForgetPasswordState extends State<ForgetPassword> {
       backgroundColor: Pallet().background_R,
       appBar: AppBar(
           leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: Pallet().blue_R,
-              size: Spaces().backButton,
-            ),
+            icon: Widgets().backArrowIcon(),
             onPressed: () => Navigator.of(context).pop(),
           ),
           elevation: 0,
           centerTitle: true,
           backgroundColor: Pallet().background_R,
-          title: Widgets().arabicText(
-              text: 'نسيت كلمة السر',
-              fontSize: Spaces().bigTitleSize,
-              color: Pallet().blue_R)),
+          title: Widgets().screenTitle('نسيت كلمة السر',Pallet().blue_R)
+      ),
       body: CustomScrollView(
         slivers: [
           SliverFillRemaining(
@@ -63,7 +58,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                       textInputType: TextInputType.emailAddress,
                       secure: false),
 
-                  Expanded(child: SizedBox(height: 20,)),
+                  Expanded(child: SizedBox(height: Spaces().mediumSize,)),
                   Padding(
                     padding: const EdgeInsets.only(left: 5,right: 5,bottom: 50),
                     child: ButtonTheme(
@@ -74,15 +69,13 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                         color: Color(0xFF33CFE8),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'طلب تغيير',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'arabic',
-                                fontSize: 20),
+                          child: Widgets().arabicText(
+                              text: 'طلب تغيير',
+                              fontSize: Spaces().mediumSize,
+                              color: Pallet().white_R
                           ),
                         ),
-                        onPressed: () async {LoginButton().Reset(context, _emailcontroller.text);},
+                        onPressed: () async {AccountButtons().Reset(context, _emailcontroller.text);},
                       ),
                     ),
                   ),

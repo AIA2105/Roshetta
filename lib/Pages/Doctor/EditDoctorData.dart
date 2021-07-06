@@ -3,8 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:roshetta/Constants/Links.dart';
 import 'package:roshetta/Constants/Pallet.dart';
 import 'package:roshetta/Constants/Spaces.dart';
+import 'package:roshetta/Constants/Strings.dart';
 import 'package:roshetta/Widgets/InputField_R.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
 import 'Doctor.dart';
@@ -33,16 +35,14 @@ class _EditDoctorDataState extends State<EditDoctorData> {
   List _genders = ['ذكر', 'أنثى'];
   File _image;
   final picker = ImagePicker();
-  Widget editData=Text(
-    'تعديل',
-    style: TextStyle(
-        color: Colors.white,
-        fontFamily: 'arabic',
-        fontSize: 20),
+  Widget editData=  Widgets().arabicText(
+    text: 'تعديل',
+    fontSize: Spaces().mediumSize,
+    color: Pallet().white_R,
   );
 
   Future<void> _download() async {
-    final _url= 'http://roshetta1.pythonanywhere.com/showprofileimage/${FirebaseAuth.instance.currentUser.uid}/${widget.doctor.profileImage}';
+    final _url= '${Links().profileImage}/${FirebaseAuth.instance.currentUser.uid}/${widget.doctor.profileImage}';
     final response = await http.get(Uri.parse(_url));
 
     // Get the image name
@@ -100,11 +100,7 @@ class _EditDoctorDataState extends State<EditDoctorData> {
       backgroundColor: Pallet().background_R,
       appBar: AppBar(
           leading: IconButton(
-              icon: Icon(
-                Icons.arrow_back_ios,
-                color: Pallet().blue_R,
-                size: Spaces().backButton,
-              ),
+              icon: Widgets().backArrowIcon(),
               onPressed: () async{
                 Navigator.pop(context);
               }
@@ -112,10 +108,8 @@ class _EditDoctorDataState extends State<EditDoctorData> {
           elevation: 0,
           centerTitle: true,
           backgroundColor: Pallet().background_R,
-          title: Widgets().arabicText(
-              text: 'تعديل بيانات الطبيب',
-              fontSize: Spaces().bigTitleSize,
-              color: Pallet().blue_R)),
+          title: Widgets().screenTitle('تعديل بيانات الطبيب',Pallet().blue_R)
+      ),
       body: CustomScrollView(
         //reverse: true,
         slivers: [
@@ -147,7 +141,7 @@ class _EditDoctorDataState extends State<EditDoctorData> {
                                           height: 150,
                                           width: 300,
                                         ):Image.network(
-                                          'http://roshetta1.pythonanywhere.com/showprofileimage/${FirebaseAuth.instance.currentUser.uid}/${widget.doctor.profileImage}',
+                                          '${Links().profileImage}/${FirebaseAuth.instance.currentUser.uid}/${widget.doctor.profileImage}',
                                           height: 130,
                                           width: 300,
                                           loadingBuilder:(BuildContext context, Widget child,ImageChunkEvent loadingProgress) {
@@ -181,11 +175,11 @@ class _EditDoctorDataState extends State<EditDoctorData> {
                                   )),
                             ]),
 
-                            Text('الصورة الشخصية', style: TextStyle(
-                                color:Pallet().red_R,
-                                fontFamily: 'arabic',
-                                fontSize: 20)),
-
+                            Widgets().arabicText(
+                              text: 'الصورة الشخصية',
+                              fontSize: Spaces().mediumSize,
+                              color: Pallet().red_R,
+                            ),
                           ],
                         )
                     ),
@@ -196,7 +190,7 @@ class _EditDoctorDataState extends State<EditDoctorData> {
                   Card(
                     shape: RoundedRectangleBorder(
                       side: BorderSide(color: Pallet().white_R, width: 1),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(Spaces().mediumSize),
                     ),
                     elevation: 10,
                     color: Pallet().white_R.withOpacity(0.8),
@@ -369,17 +363,15 @@ class _EditDoctorDataState extends State<EditDoctorData> {
 
                               if(res=='false'){
                                 setState(() {
-                                  editData= Text(
-                                    'تعديل',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontFamily: 'arabic',
-                                        fontSize: 20),
+                                  editData= Widgets().arabicText(
+                                    text: 'تعديل',
+                                    fontSize: Spaces().mediumSize,
+                                    color: Pallet().white_R,
                                   );
                                 });
 
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                    Widgets().snakbar(
+                                    Widgets().snakBar(
                                         text: 'حدثت مشكلة برجاء المحاولة لاحقاََ',
                                         background: Pallet().red_R,
                                         duration: 2));
@@ -392,7 +384,7 @@ class _EditDoctorDataState extends State<EditDoctorData> {
                                       builder: (context) => DoctorHomeScreen()),
                                 );
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                    Widgets().snakbar(
+                                    Widgets().snakBar(
                                         text: 'تم تعديل البيانات بنجاح',
                                         background: Pallet().green,
                                         duration: 2));
@@ -400,7 +392,7 @@ class _EditDoctorDataState extends State<EditDoctorData> {
                               //
                             }else{
                               ScaffoldMessenger.of(context).showSnackBar(
-                                  Widgets().snakbar(
+                                  Widgets().snakBar(
                                       text: 'برجاء اكمال البيانات',
                                       background: Pallet().red_R,
                                       duration: 2));

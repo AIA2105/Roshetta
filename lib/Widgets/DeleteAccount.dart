@@ -3,8 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:roshetta/Constants/Pallet.dart';
+import 'package:roshetta/Constants/Spaces.dart';
+import 'package:roshetta/Constants/Strings.dart';
 import 'package:roshetta/Pages/Doctor/DoctorDatabase.dart';
 import 'package:roshetta/Pages/Login%20System/LoginScreen.dart';
+
+import 'Widgets.dart';
 
 class DeleteAccount extends StatefulWidget {
   const DeleteAccount({Key key}) : super(key: key);
@@ -34,34 +38,30 @@ class _DeleteAccountState extends State<DeleteAccount> {
                 textDirection: TextDirection.rtl,
                 style: TextStyle(
                     color: Pallet().red_R,
-                    fontFamily: 'arabic',
+                    fontFamily: Strings().arabicFontFamily,
                     fontWeight: FontWeight.bold,
-                    fontSize: 20),
+                    fontSize: Spaces().mediumSize),
               ),
               actions: [
                 FlatButton(
-                  child: Text(
-                    'الغاء العملية',
-                    style: TextStyle(
-                        color: Pallet().blue_R,
-                        fontFamily: 'arabic',
-                        fontSize: 16),
+                  child: Widgets().arabicText(
+                    text: 'الغاء العملية',
+                    fontSize: 16,
+                    color: Pallet().blue_R,
                   ),
                   onPressed:  (){
                     Navigator.pop(context);
                   },
                 ),
                 FlatButton(
-                  child: Text(
-                    'حذف الحساب',
-                    style: TextStyle(
-                        color: Color(0xFFC63C22),
-                        fontFamily: 'arabic',
-                        fontSize: 16),
+                  child:Widgets().arabicText(
+                    text: 'حذف الحساب',
+                    fontSize: 16,
+                    color: Pallet().red_R,
                   ),
                   onPressed:  () async{
                     DoctorDatabase().delete(user.uid);
-                    await FirebaseFirestore.instance.collection('users').doc(user.uid).delete();
+                    await FirebaseFirestore.instance.collection(Strings().fireStoreTableName).doc(user.uid).delete();
                     await FirebaseAuth.instance.currentUser.delete();
                     Navigator.pushReplacement(context,
                         MaterialPageRoute(builder: (context) => LoginScreen()));
@@ -75,12 +75,10 @@ class _DeleteAccountState extends State<DeleteAccount> {
         );
 
       },
-      child: Text(
-        'حذف الحساب',
-        style: TextStyle(
-            color: Color(0xFFC63C22),
-            fontFamily: 'arabic',
-            fontSize: 20),
+      child: Widgets().arabicText(
+        text: 'حذف الحساب',
+        fontSize: Spaces().mediumSize,
+        color: Pallet().red_R,
       ),
     );
   }

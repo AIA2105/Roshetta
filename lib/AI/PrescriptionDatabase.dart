@@ -1,13 +1,14 @@
 import 'package:http/http.dart' as http;
 import 'dart:io';
+import 'package:roshetta/Constants/Links.dart';
 
-class AI{
+class PrescriptionDatabase {
   String _finalResult;
 
   Future<String> postPrescription(String id, File image) async {
-
     //create multipart request for POST or PATCH method
-    var request = http.MultipartRequest("POST", Uri.parse("http://roshetta1.pythonanywhere.com/prescription"));
+    var request =
+        http.MultipartRequest("POST", Uri.parse(Links().prescription));
     //add text fields
     request.fields["patient_id"] = id;
     //create multipart using filepath, string or bytes
@@ -19,14 +20,16 @@ class AI{
     //Get the response from the server
     var responseData = await response.stream.toBytes();
     var responseString = String.fromCharCodes(responseData);
-    _finalResult= responseString;
+    _finalResult = responseString;
     print(_finalResult);
-    if(!_finalResult.contains('Tunnel') && !_finalResult.contains('.ngrok.io not found')){
+
+    if (!_finalResult.contains('Tunnel') &&
+        !_finalResult.contains('.ngrok.io not found') &&
+        !_finalResult.contains('<title>500 Internal Server Error</title>') &&
+        _finalResult != 'Error') {
       return _finalResult;
-    }else{
+    } else {
       return 'AI Server is Off';
     }
   }
-
-
 }

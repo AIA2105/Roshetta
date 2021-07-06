@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:roshetta/Constants/Pallet.dart';
 import 'package:roshetta/Constants/Spaces.dart';
+import 'package:roshetta/Constants/Strings.dart';
 import 'package:roshetta/Pages/Login%20System/LoginScreen.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
 
@@ -39,7 +40,7 @@ class _ResetEmailSentState extends State<ResetEmailSent> {
                       color: Pallet().red_R),
                   Expanded(
                       child: SizedBox(
-                    height: 20,
+                    height: Spaces().mediumSize,
                   )),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -51,13 +52,12 @@ class _ResetEmailSentState extends State<ResetEmailSent> {
                         color: Color(0xFF33CFE8),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'العودة الى الصفحة الرئيسية',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'arabic',
-                                fontSize: 20),
+                          child: Widgets().arabicText(
+                              text: 'العودة الى الصفحة الرئيسية',
+                              fontSize: Spaces().mediumSize,
+                              color: Pallet().white_R
                           ),
+
                         ),
                         onPressed: (){
                           Navigator.pushReplacement(

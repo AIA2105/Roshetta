@@ -2,19 +2,12 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:async';
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:path_provider/path_provider.dart';
+import 'package:roshetta/Constants/Links.dart';
+import 'package:roshetta/Constants/Methods.dart';
 import 'Doctor.dart';
 
 class DoctorDatabase {
 
-  Future<File> getImageFileFromAssets(String path,String tmp) async {
-    final byteData = await rootBundle.load(path);
-    String tempPath = (await getTemporaryDirectory()).path;
-    File file = File('$tempPath/$tmp');
-    await file.writeAsBytes(byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
-    return file;
-  }
 
   post(
       String id,
@@ -30,9 +23,9 @@ class DoctorDatabase {
       File profileImage) async {
 
     var pic;
-    File f = await getImageFileFromAssets('images/newDoctor.png','newDoctor.png');
+    File f = await Methods.getImageFileFromAssets('images/newDoctor.png','newDoctor.png');
     //create multipart request for POST or PATCH method
-    var request = http.MultipartRequest("POST", Uri.parse("http://roshetta1.pythonanywhere.com/doctor"));
+    var request = http.MultipartRequest("POST", Uri.parse(Links().doctor));
     //add text fields
     request.fields["email"]= email;
     request.fields["address"]= address;
@@ -76,7 +69,7 @@ class DoctorDatabase {
       File profileImage) async {
 
     var pic;
-    var request = http.MultipartRequest("PUT", Uri.parse("http://roshetta1.pythonanywhere.com/doctor/id=$id"));
+    var request = http.MultipartRequest("PUT", Uri.parse("${Links().doctor}/id=$id"));
     //add text fields
     request.fields["email"]= email;
     request.fields["address"]= address;
@@ -101,11 +94,12 @@ class DoctorDatabase {
 
     print(response.statusCode);
     print(responseString);
+
     return responseString;
   }
 
   delete(String id) async {
-    var url = Uri.parse('http://roshetta1.pythonanywhere.com/doctors/id=$id');
+    var url = Uri.parse('${Links().doctor}s/id=$id');
     final http.Response response = await http.delete(
       url,
       headers: <String, String>{
@@ -119,7 +113,7 @@ class DoctorDatabase {
   }
 
   Future<Doctor> get(String id) async {
-    var url = Uri.parse('http://roshetta1.pythonanywhere.com/doctor/id=$id');
+    var url = Uri.parse('${Links().doctor}/id=$id');
     var response = await http.get(url);
     var doctorData = List<Doctor>();
     if (response.statusCode == 200) {

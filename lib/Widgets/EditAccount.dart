@@ -1,11 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:roshetta/Constants/Pallet.dart';
+import 'package:roshetta/Constants/Spaces.dart';
 import 'package:roshetta/Pages/Doctor/Doctor.dart';
 import 'package:roshetta/Pages/Doctor/EditDoctorData.dart';
 import 'package:roshetta/Pages/Patient/EditPatientData.dart';
 import 'package:roshetta/Pages/Patient/Patient.dart';
 import 'package:roshetta/Pages/Pharmacy/EditPharmacyData.dart';
 import 'package:roshetta/Pages/Pharmacy/Pharmacy.dart';
+
+import 'Widgets.dart';
 
 
 
@@ -34,12 +38,10 @@ class _EditAccountState extends State<EditAccount> {
               MaterialPageRoute(builder: (context) =>EditPharmacyData(widget.user)));
         }
       },
-      child: Text(
-        'تعديل البيانات',
-        style: TextStyle(
-            color: Color(0xFFC63C22),
-            fontFamily: 'arabic',
-            fontSize: 20),
+      child: Widgets().arabicText(
+        text: 'تعديل البيانات',
+        fontSize: Spaces().mediumSize,
+        color: Pallet().red_R,
       ),
     );
   }

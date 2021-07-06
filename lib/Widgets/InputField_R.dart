@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:roshetta/Constants/Pallet.dart';
 import 'package:roshetta/Constants/Spaces.dart';
+import 'package:roshetta/Constants/Strings.dart';
 
 class InputField_R extends StatefulWidget {
   final Text title;
@@ -50,7 +51,7 @@ class _InputField_RState extends State<InputField_R> {
           maxLength: widget.length,
           cursorColor: Pallet().blue_R,
           obscureText: secure,
-          style: TextStyle(fontSize: Spaces().smallSize, fontFamily: 'arabic'),
+          style: TextStyle(fontSize: Spaces().smallSize, fontFamily: Strings().arabicFontFamily),
           keyboardType: textInputType,
           controller: textEditingController,
           decoration: InputDecoration(

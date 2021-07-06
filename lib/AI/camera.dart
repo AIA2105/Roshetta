@@ -3,10 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:roshetta/AI/AI.dart';
+import 'package:roshetta/AI/PrescriptionDatabase.dart';
 import 'dart:io';
 import 'package:roshetta/Constants/Pallet.dart';
-import 'package:roshetta/AI/AIScreen.dart';
+import 'package:roshetta/AI/AIResultScreen.dart';
 import '../Constants/Spaces.dart';
 import '../Widgets/Widgets.dart';
 
@@ -20,19 +20,16 @@ class _CameraState extends State<Camera> {
   File _image;
   final picker = ImagePicker();
   String finalResult;
-  Widget progress= Text(
-      'تحليل الصورة',
-      style: TextStyle(
-          color: Colors.white,
-          fontFamily: 'arabic',
-          fontSize: 22)
+  Widget progress= Widgets().arabicText(
+  text: 'تحليل الصورة',
+  fontSize:Spaces().bigTitleSize,
+  color: Pallet().white_R,
   );
 
   Future getCamera() async {
     final pickedFile = await picker.getImage(source: ImageSource.camera);
     _image = File(pickedFile.path);
     cropImage();
-
   }
 
   Future getGallery() async {
@@ -55,8 +52,8 @@ class _CameraState extends State<Camera> {
           lockAspectRatio: false,
           toolbarTitle: 'قص السطر المراد تحليله',
           toolbarColor: Pallet().blue_R,
-          toolbarWidgetColor: Colors.white,
-          initAspectRatio: CropAspectRatioPreset.ratio16x9,
+          toolbarWidgetColor: Pallet().white_R,
+          initAspectRatio: CropAspectRatioPreset.original,
           activeControlsWidgetColor: Pallet().red_R,
           backgroundColor: Pallet().white_R,
         ));
@@ -73,22 +70,16 @@ class _CameraState extends State<Camera> {
 
     return Scaffold(
       backgroundColor: Pallet().background_R,
-      appBar:  AppBar(
+      appBar: AppBar(
           leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: Pallet().blue_R,
-              size: Spaces().backButton,
-            ),
+            icon: Widgets().backArrowIcon(),
             onPressed: () => Navigator.of(context).pop(),
           ),
           elevation: 0,
           centerTitle: true,
           backgroundColor: Pallet().background_R,
-          title: Widgets().arabicText(
-              text: 'اختيار صورة',
-              fontSize: Spaces().bigTitleSize,
-              color: Pallet().blue_R)),
+          title: Widgets().screenTitle('اختيار صورة',Pallet().blue_R)
+      ),
       body: Column(
         children: [
           Expanded(
@@ -104,13 +95,13 @@ class _CameraState extends State<Camera> {
                           size: 50,
                         ),
                       ),
-                      Text(
-                        'احرص على وضوح اسم الدواء',
-                        style: TextStyle(
-                            color: Colors.black26,
-                            fontFamily: 'arabic',
-                            fontSize: 22),
+
+                      Widgets().arabicText(
+                        text: 'احرص على وضوح اسم الدواء',
+                        fontSize:Spaces().bigTitleSize,
+                        color: Colors.black26,
                       ),
+
                     ],
                   )
 
@@ -123,21 +114,23 @@ class _CameraState extends State<Camera> {
                 Expanded(
                     child: FlatButton(
                   onPressed: getCamera,
-                  child: Text('اختار من الكاميرا',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'arabic',
-                          fontSize: 22)),
+                  child: Widgets().arabicText(
+                        text: 'اختار من الكاميرا',
+                        fontSize:Spaces().bigTitleSize,
+                        color: Pallet().white_R,
+                      ),
+
                   color: Pallet().blue_R,
                   padding: EdgeInsets.all(15),
                 )),
                 Expanded(
                     child: FlatButton(
                   onPressed: getGallery,
-                  child: Text('اختار من المعرض', style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'arabic',
-                      fontSize: 22)),
+                  child: Widgets().arabicText(
+                        text: 'اختار من المعرض',
+                        fontSize:Spaces().bigTitleSize,
+                        color: Pallet().white_R,
+                      ),
                   color: Pallet().red_R,
                   padding: EdgeInsets.all(15),
                 )),
@@ -151,26 +144,22 @@ class _CameraState extends State<Camera> {
                     setState(() {
                       progress= CircularProgressIndicator(color: Pallet().white_R,);
                     });
-                    String result= await AI().postPrescription(FirebaseAuth.instance.currentUser.uid, _image);
+                    String result= await PrescriptionDatabase().postPrescription(FirebaseAuth.instance.currentUser.uid, _image);
                     finalResult= result;
                     if(finalResult!='AI Server is Off'){
                       Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => AIScreen(result: finalResult)));
+                          MaterialPageRoute(builder: (context) => AIResultScreen(result: finalResult)));
                     }else{
                       setState(() {
-                        progress=Text(
-                            'السيرفر غير متاح الآن',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'arabic',
-                                fontSize: 22)
+                        progress= Widgets().arabicText(
+                          text: 'السيرفر غير متاح الآن',
+                          fontSize:Spaces().bigTitleSize,
+                          color: Pallet().white_R,
                         );
+
                       });
                     }
-
-
-
-                  },
+                    },
                   child: progress,
                   color: Pallet().red_R,
                   padding: EdgeInsets.all(15),

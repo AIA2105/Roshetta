@@ -1,12 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:roshetta/AI/camera.dart';
 import 'package:roshetta/Constants/Pallet.dart';
+import 'package:roshetta/Constants/Spaces.dart';
 import 'package:roshetta/Widgets/DeleteAccount.dart';
 import 'package:roshetta/Widgets/EditAccount.dart';
 import 'package:roshetta/Widgets/ExitAccount.dart';
-import '../Login System/LoginScreen.dart';
+import 'package:roshetta/Widgets/Widgets.dart';
 import 'Pharmacy.dart';
 import 'PharmacyDatabase.dart';
 
@@ -23,7 +23,6 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen> {
   Future<String> downloadData()async{
     pharmacy= await PharmacyDatabase().get(FirebaseAuth.instance.currentUser.uid);
     return Future.value("Data download successfully");
-    // return your response
   }
 
 
@@ -34,13 +33,13 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen> {
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {  // AsyncSnapshot<Your object type>
         if( snapshot.connectionState == ConnectionState.waiting){
           return Scaffold(
-            backgroundColor: Color(0xFFF5F5F5),
+            backgroundColor:Pallet().background_R,
             body: Center(child: CircularProgressIndicator(color: Pallet().blue_R,)),
           );
         }else{
           if (snapshot.hasError)
             return Scaffold(
-              backgroundColor: Color(0xFFF5F5F5),
+              backgroundColor:Pallet().background_R,
               body: Center(child: Text('Error: ${snapshot.error}')),
             );
           else
@@ -54,55 +53,24 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen> {
                       MaterialPageRoute(builder: (context) => Camera()));
                 },
               ),
-              backgroundColor: Color(0xFFF5F5F5),
+              backgroundColor:Pallet().background_R,
               appBar: AppBar(
                 centerTitle: true,
                 backgroundColor: Color(0xFF33CFE8),
-                title: Text(
-                  'الصفحة الرئيسية للصيدلي',
-                  textDirection: TextDirection.rtl,
-                  style: TextStyle(
-                      color: Colors.white, fontFamily: 'arabic', fontSize: 20),
-                ),
+                title: Widgets().screenTitle('الصفحة الرئيسية للصيدلي',Pallet().white_R)
               ),
               body: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: CircleAvatar(
-                          radius: 75,
-                          backgroundColor: Pallet().blue_R,
-                          child: CircleAvatar(
-                              radius: 70,
-                              backgroundColor: Pallet().white_R,
-                              child: ClipOval(
-                                  child: Image.network(
-                                    'http://roshetta1.pythonanywhere.com/showprofileimage/${FirebaseAuth.instance.currentUser.uid}/${pharmacy.profileImage}',
-                                    height: 130,
-                                    width: 300,
-                                    loadingBuilder:(BuildContext context, Widget child,ImageChunkEvent loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return Center(
-                                        child: CircularProgressIndicator(color: Pallet().blue_R,),
-                                      );
-                                    },
-                                  )
-                              )
-                          ),
-                        )
-                    ),
-
+                    Widgets().profilePicture(FirebaseAuth.instance.currentUser.uid, pharmacy.profileImage),
                     Container(
                       alignment: Alignment.center,
-                      child: Text(
-                        'مرحبا بك ${pharmacy.firstName}',
-                        textDirection: TextDirection.rtl,
-                        style: TextStyle(
-                            color: Color(0xFFC63C22),
-                            fontFamily: 'arabic',
-                            fontSize: 22),
+                      child: Widgets().arabicText(
+                          text:'مرحبا بك ${pharmacy.firstName}',
+                          fontSize:Spaces().bigTitleSize,
+                          color: Pallet().red_R,
+                          textDirection: TextDirection.rtl
                       ),
                     ),
                   ],
@@ -114,9 +82,9 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         EditAccount(pharmacy),
-                        SizedBox(height: 20,),
+                        SizedBox(height: Spaces().mediumSize,),
                         ExitAccount(),
-                        SizedBox(height: 20,),
+                        SizedBox(height: Spaces().mediumSize,),
                         DeleteAccount(),
                       ],
                     ),

@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:roshetta/Constants/Strings.dart';
+import 'package:roshetta/Constants/Users.dart';
 import 'Pages/Doctor/DoctorHomeScreen.dart';
 import 'Pages/Login System/LoginScreen.dart';
 import 'Pages/Login System/NoInternet.dart';
 import 'Pages/Patient/PatientHomeScreen.dart';
-import 'Pages/Patient/PatientDatabase.dart';
 import 'Pages/Pharmacy/PharmacyHomeScreen.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 
@@ -24,15 +24,15 @@ void main() async {
   bool result = await InternetConnectionChecker().hasConnection;
   if(result == true) {
     print('We have internet!');
-    var mainUser=0;
+    var mainUser = Users().noUser;
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp();
     if(FirebaseAuth.instance.currentUser !=null){
       print('Current User Found!');
-      await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser.uid).get()
+      await FirebaseFirestore.instance.collection(Strings().fireStoreTableName).doc(FirebaseAuth.instance.currentUser.uid).get()
           .then((DocumentSnapshot documentSnapshot) async {
         if (documentSnapshot.exists) {
-          mainUser= documentSnapshot['id'];
+          mainUser= documentSnapshot[Strings().fireStoreUserID];
           print('from main mainUser= $mainUser');
         }else{
           mainUser= 0;
@@ -46,7 +46,7 @@ void main() async {
 
     runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Roshetta',
+      title: Strings().appName,
       home: FirebaseAuth.instance.currentUser != null? userScreen(mainUser):LoginScreen(),
     ));
   } else {
@@ -54,7 +54,7 @@ void main() async {
     print(InternetConnectionChecker().lastTryResults);
     runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Roshetta',
+      title: Strings().appName,
       home: NoInternet(),
     ));
   }
@@ -64,13 +64,13 @@ void main() async {
 Widget userScreen(int mainUser){
 
   print('from userScreen mainUser= $mainUser');
-  if(mainUser==1){
+  if(mainUser==Users().patient){
     return PatientHomeScreen();
-  }else if(mainUser==2){
+  }else if(mainUser==Users().doctor){
     return DoctorHomeScreen();
-  }else if(mainUser==3){
+  }else if(mainUser==Users().pharmacy){
     return PharmacyHomeScreen();
-  }else if(mainUser==0){
+  }else if(mainUser==Users().noUser){
     print('User Auth has deleted -Cause: Auth found but data not found for ${FirebaseAuth.instance.currentUser.uid}');
     return LoginScreen();
   }else{

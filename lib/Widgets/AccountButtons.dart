@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:roshetta/Constants/Pallet.dart';
+import 'package:roshetta/Constants/Strings.dart';
+import 'package:roshetta/Constants/Users.dart';
 import 'package:roshetta/Pages/Doctor/DoctorHomeScreen.dart';
 import 'package:roshetta/Pages/Login%20System/ChooseNewUser.dart';
 import 'package:roshetta/Pages/Login%20System/ResetEmailSent.dart';
@@ -9,7 +11,7 @@ import 'package:roshetta/Pages/Patient/PatientHomeScreen.dart';
 import 'package:roshetta/Pages/Pharmacy/PharmacyHomeScreen.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
 
-class LoginButton {
+class AccountButtons {
 
    Future<bool> login(BuildContext context, String email, String password) async {
     print('try to login');
@@ -22,22 +24,22 @@ class LoginButton {
         if (result != null) {
           // pushReplacement
           FirebaseFirestore.instance
-              .collection('users')
+              .collection(Strings().fireStoreTableName)
               .doc(result.user.uid)
               .get()
               .then((DocumentSnapshot documentSnapshot) {
             if (documentSnapshot.exists) {
-              if (documentSnapshot['id'] == 1) {
+              if (documentSnapshot[Strings().fireStoreUserID] == Users().patient) {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => PatientHomeScreen()),
                 );
-              } else if (documentSnapshot['id'] == 2) {
+              } else if (documentSnapshot[Strings().fireStoreUserID] == Users().doctor) {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => DoctorHomeScreen()),
                 );
-              } else if (documentSnapshot['id'] == 3) {
+              } else if (documentSnapshot[Strings().fireStoreUserID] == Users().pharmacy) {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => PharmacyHomeScreen()),
@@ -50,8 +52,8 @@ class LoginButton {
 
       } on FirebaseAuthException catch (e) {
         if (e.code != null) {
-          print('erooooooooooooor');
-          ScaffoldMessenger.of(context).showSnackBar(Widgets().snakbar(
+          print('------- error --------');
+          ScaffoldMessenger.of(context).showSnackBar(Widgets().snakBar(
               text: 'خطأ في البيانات',
               background: Pallet().red_R,
               duration: 2
@@ -60,7 +62,7 @@ class LoginButton {
         }
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(Widgets().snakbar(
+      ScaffoldMessenger.of(context).showSnackBar(Widgets().snakBar(
           text: 'برجاء ادخال البيانات',
           background: Pallet().red_R,
           duration: 2
@@ -83,8 +85,8 @@ class LoginButton {
       } on FirebaseAuthException catch (e) {
         print(e);
         if (e.code != null) {
-          print('erooooooooooooor');
-          ScaffoldMessenger.of(context).showSnackBar(Widgets().snakbar(
+          print('------- error --------');
+          ScaffoldMessenger.of(context).showSnackBar(Widgets().snakBar(
               text: 'خطأ في البيانات',
               background: Pallet().red_R,
               duration: 2
@@ -92,7 +94,7 @@ class LoginButton {
         }
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(Widgets().snakbar(
+      ScaffoldMessenger.of(context).showSnackBar(Widgets().snakBar(
           text: 'برجاء ادخال البيانات',
           background: Pallet().red_R,
           duration: 2
@@ -102,7 +104,7 @@ class LoginButton {
 
   void newUser(BuildContext context, String email, String password) async {
     print('try to signup');
-    print('email:${email}, password: $password');
+    print('email:$email, password: $password');
     if (email.isNotEmpty && password.isNotEmpty) {
       try {
         var result = await FirebaseAuth.instance
@@ -118,8 +120,8 @@ class LoginButton {
         }
       } on FirebaseAuthException catch (e) {
         if (e.code != null) {
-          print('erooooooooooooor');
-          ScaffoldMessenger.of(context).showSnackBar(Widgets().snakbar(
+          print('------- error --------');
+          ScaffoldMessenger.of(context).showSnackBar(Widgets().snakBar(
               text: 'خطأ في البيانات',
               background: Pallet().red_R,
               duration: 2
@@ -127,7 +129,7 @@ class LoginButton {
         }
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(Widgets().snakbar(
+      ScaffoldMessenger.of(context).showSnackBar(Widgets().snakBar(
           text: 'برجاء ادخال البيانات',
           background: Pallet().red_R,
           duration: 2

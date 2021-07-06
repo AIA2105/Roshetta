@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:roshetta/Constants/Pallet.dart';
 import 'package:roshetta/Constants/Spaces.dart';
+import 'package:roshetta/Constants/Strings.dart';
 import 'package:roshetta/Widgets/InputField_R.dart';
-import 'package:roshetta/Widgets/LoginButton.dart';
+import 'package:roshetta/Widgets/AccountButtons.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
 import 'package:roshetta/Pages/Login%20System/newUser.dart';
 import 'package:flutter/rendering.dart';
@@ -48,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Card(
                 shape: RoundedRectangleBorder(
                   side: BorderSide(color: Pallet().white_R, width: 1),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(Spaces().mediumSize),
                 ),
                 elevation: 10,
                 color: Pallet().white_R.withOpacity(0.8),
@@ -95,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             'نسيت كلمةالسر؟',
                             style: TextStyle(
                               color: Pallet().red_R,
-                              fontFamily: 'arabic',
+                              fontFamily: Strings().arabicFontFamily,
                               fontSize: Spaces().smallestSize,
                               decoration: TextDecoration.underline,
                             ),
@@ -113,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 children: [
                                   InkWell(
                                     onTap: () {
-                                      ScaffoldMessenger.of(context).showSnackBar(Widgets().snakbar(
+                                      ScaffoldMessenger.of(context).showSnackBar(Widgets().snakBar(
                                           text: 'قريباََ',
                                           background: Pallet().green,
                                           duration: 2
@@ -123,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      ScaffoldMessenger.of(context).showSnackBar(Widgets().snakbar(
+                                      ScaffoldMessenger.of(context).showSnackBar(Widgets().snakBar(
                                           text: 'قريباََ',
                                           background: Pallet().green,
                                           duration: 2
@@ -157,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       child: login,
                                     ),
                                     onPressed: () async {
-                                      LoginButton().login(
+                                      AccountButtons().login(
                                           context,
                                           _emailcontroller.text,
                                           _passwordcontroller.text).then((value) {
@@ -186,7 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       '! مستخدم جديد',
                                       style: TextStyle(
                                         color: Pallet().red_R,
-                                        fontFamily: 'arabic',
+                                        fontFamily: Strings().arabicFontFamily,
                                         fontSize: Spaces().smallSize,
                                         decoration: TextDecoration.underline,
                                       ),
@@ -199,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                       SizedBox(
-                        height: 20,
+                        height: Spaces().mediumSize,
                       ),
                     ],
                   ),
