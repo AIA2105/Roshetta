@@ -8,6 +8,7 @@ import 'package:roshetta/Constants/Pallet.dart';
 import 'package:roshetta/Constants/Spaces.dart';
 import 'package:roshetta/Constants/Strings.dart';
 import 'package:roshetta/Pages/Patient/Patient.dart';
+import 'package:roshetta/Widgets/DeleteAccount.dart';
 import 'package:roshetta/Widgets/InputField_R.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
 import 'package:http/http.dart' as http;
@@ -359,91 +360,94 @@ class _EditPatientDataState extends State<EditPatientData> {
                         height: 50,
                       )),
                   Padding(
-                    padding:
-                    const EdgeInsets.only(left: 5, right: 5, bottom: 50),
-                    child: ButtonTheme(
-                      minWidth: double.maxFinite,
-                      child: RaisedButton(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0)),
-                          color: Color(0xFF33CFE8),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: editData,
-                          ),
-                          onPressed: () async {
+                    padding: const EdgeInsets.only(left: 5, right: 5, bottom: 50),
+                    child: Row(
+                      children: [
+                        DeleteAccount(),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: RaisedButton(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: new BorderRadius.circular(30.0)),
+                              color: Pallet().blue_R,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: editData,
+                              ),
+                              onPressed: () async {
+                                if (_firstNamecontroller.text.isNotEmpty &&
+                                    _lastNamecontroller.text.isNotEmpty &&
+                                    _addresscontroller.text.isNotEmpty &&
+                                    _phonecontroller.text.isNotEmpty &&
+                                    _birthday.isNotEmpty &&
+                                    _heightcontroller.text.isNotEmpty &&
+                                    _weighthcontroller.text.isNotEmpty) {
 
-                            if (_firstNamecontroller.text.isNotEmpty &&
-                                _lastNamecontroller.text.isNotEmpty &&
-                                _addresscontroller.text.isNotEmpty &&
-                                _phonecontroller.text.isNotEmpty &&
-                                _birthday.isNotEmpty &&
-                                _heightcontroller.text.isNotEmpty &&
-                                _weighthcontroller.text.isNotEmpty) {
+                                  setState(() {
+                                    editData= CircularProgressIndicator(color: Pallet().white_R,);
+                                  });
+                                  ////////////////////////////////////////////////////////
+                                  var res =await PatientDatabase().update(
+                                      FirebaseAuth.instance.currentUser.email,
+                                      _addresscontroller.text,
+                                      _blood,
+                                      _birthday,
+                                      _firstNamecontroller.text,
+                                      _lastNamecontroller.text,
+                                      _gender,
+                                      _heightcontroller.text,
+                                      FirebaseAuth.instance.currentUser.uid,
+                                      _phonecontroller.text,
+                                      _image,
+                                      _state,
+                                      _weighthcontroller.text);
+                                  ////////////////////////////////////////////////////
 
-                              setState(() {
-                                editData= CircularProgressIndicator(color: Pallet().white_R,);
-                              });
-                              ////////////////////////////////////////////////////////
-                              var res =await PatientDatabase().update(
-                                  FirebaseAuth.instance.currentUser.email,
-                                  _addresscontroller.text,
-                                  _blood,
-                                  _birthday,
-                                  _firstNamecontroller.text,
-                                  _lastNamecontroller.text,
-                                  _gender,
-                                  _heightcontroller.text,
-                                  FirebaseAuth.instance.currentUser.uid,
-                                  _phonecontroller.text,
-                                  _image,
-                                  _state,
-                                  _weighthcontroller.text);
-                              ////////////////////////////////////////////////////
+                                  print(res);
 
-                              print(res);
+                                  if(res=='false'){
+                                    setState(() {
+                                      editData= Widgets().arabicText(
+                                        text: 'تعديل',
+                                        fontSize: Spaces().mediumSize,
+                                        color: Pallet().white_R,
+                                      );
+                                    });
 
-                              if(res=='false'){
-                                setState(() {
-                                  editData= Widgets().arabicText(
-                                    text: 'تعديل',
-                                    fontSize: Spaces().mediumSize,
-                                    color: Pallet().white_R,
-                                  );
-                                });
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        Widgets().snakBar(
+                                            text: 'حدثت مشكلة برجاء المحاولة لاحقاََ',
+                                            background: Pallet().red_R,
+                                            duration: 2));
+                                    //
 
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    Widgets().snakBar(
-                                        text: 'حدثت مشكلة برجاء المحاولة لاحقاََ',
-                                        background: Pallet().red_R,
-                                        duration: 2));
-                            //
-
-                              }else{
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => PatientHomeScreen()),
-                                );
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    Widgets().snakBar(
-                                        text: 'تم تعديل البيانات بنجاح',
-                                        background: Pallet().green,
-                                        duration: 2));
+                                  }else{
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => PatientHomeScreen()),
+                                    );
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        Widgets().snakBar(
+                                            text: 'تم تعديل البيانات بنجاح',
+                                            background: Pallet().green,
+                                            duration: 2));
+                                  }
+                                  //
+                                }else{
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      Widgets().snakBar(
+                                          text: 'برجاء اكمال البيانات',
+                                          background: Pallet().red_R,
+                                          duration: 2));
+                                }
                               }
-                            //
-                            }else{
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  Widgets().snakBar(
-                                      text: 'برجاء اكمال البيانات',
-                                      background: Pallet().red_R,
-                                      duration: 2));
-                            }
-                          }
-                        ////////////////////////////////////////////////////////
+                            ////////////////////////////////////////////////////////
 
-                      ),
-                    ),
+                          ),
+                        ),
+                      ],
+                    )
                   ),
                 ],
               ),

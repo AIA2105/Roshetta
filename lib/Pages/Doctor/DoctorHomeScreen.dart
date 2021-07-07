@@ -54,35 +54,32 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
                 title: Widgets().screenTitle('الصفحة الرئيسية للطبيب',Pallet().white_R)
               ),
               body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Widgets().profilePicture(FirebaseAuth.instance.currentUser.uid, doctor.profileImage),
-                    Container(
-                      alignment: Alignment.center,
-                      child: Widgets().arabicText(
-                          text:'مرحبا بك ${doctor.firstName}',
-                          fontSize:Spaces().bigTitleSize,
-                          color: Pallet().red_R,
-                          textDirection: TextDirection.rtl
-                      ),
-                    ),
-                  ],
-                ),
+                  child: Text('HI !')
               ),
-              drawer: Drawer(
-                  child: Center(
+              drawer: ClipRRect(
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(180)),
+                child: Drawer(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        EditAccount(doctor),
-                        SizedBox(height: Spaces().mediumSize),
-                       ExitAccount(),
-                        SizedBox(height: Spaces().mediumSize),
-                        DeleteAccount(),
+                        SizedBox(height: 100,),
+                        EditAccount(FirebaseAuth.instance.currentUser.uid ,doctor.profileImage, doctor),
+                        Widgets().arabicText(
+                            text:'${doctor.firstName} ${doctor.lastName}',
+                            fontSize:Spaces().bigTitleSize,
+                            color: Pallet().red_R,
+                            textDirection: TextDirection.rtl
+                        ),
+                        SizedBox(height: 100,),
+
+                        Expanded(child:Container()),
+                        /////////////////////////
+
+                        ExitAccount(),
                       ],
-                    ),
-                  )),
+                    )),
+              ),
             );
           }  // snapshot.data  :- get your object which is pass from your downloadData() function
         }

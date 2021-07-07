@@ -18,58 +18,67 @@ class ExitAccount extends StatefulWidget {
 class _ExitAccountState extends State<ExitAccount> {
   @override
   Widget build(BuildContext context) {
-    return FlatButton(
-      onPressed: () async {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              titlePadding: EdgeInsets.only(right: 40,left: 30,top: 10),
-              title: Text(
-                'متأكد من رغبتك في الخروج؟',
-                textDirection: TextDirection.rtl,
-                style: TextStyle(
-                    color: Pallet().red_R,
-                    fontFamily: Strings().arabicFontFamily,
-                    fontWeight: FontWeight.bold,
-                    fontSize: Spaces().mediumSize),
-              ),
-              actions: [
-                FlatButton(
-                  child: Widgets().arabicText(
-                    text: 'الغاء العملية',
-                    fontSize: 16,
-                    color: Pallet().blue_R,
-                  ),
-                  onPressed:  (){
-                    Navigator.pop(context);
-                  },
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: ListTile(
+        onTap: () async {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                titlePadding: EdgeInsets.only(right: 40,left: 30,top: 10),
+                title: Text(
+                  'متأكد من رغبتك في الخروج؟',
+                  textDirection: TextDirection.rtl,
+                  style: TextStyle(
+                      color: Pallet().red_R,
+                      fontFamily: Strings().arabicFontFamily,
+                      fontWeight: FontWeight.bold,
+                      fontSize: Spaces().mediumSize),
                 ),
-                FlatButton(
-                  child: Widgets().arabicText(
-                    text: 'تسجيل الخروج',
-                    fontSize: 16,
-                    color: Pallet().red_R,
+                actions: [
+                  FlatButton(
+                    child: Widgets().arabicText(
+                      text: 'الغاء العملية',
+                      fontSize: 16,
+                      color: Pallet().blue_R,
+                    ),
+                    onPressed:  (){
+                      Navigator.pop(context);
+                    },
                   ),
-                  onPressed:  () async{
-                    var user= FirebaseAuth.instance.currentUser;
-                    var result = await FirebaseAuth.instance.signOut();
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => LoginScreen()));
-                    print('exit Account');
-                  },
-                ),
+                  FlatButton(
+                    child: Widgets().arabicText(
+                      text: 'تسجيل الخروج',
+                      fontSize: 16,
+                      color: Pallet().red_R,
+                    ),
+                    onPressed:  () async{
+                      var user= FirebaseAuth.instance.currentUser;
+                      var result = await FirebaseAuth.instance.signOut();
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => LoginScreen()));
+                      print('exit Account');
+                    },
+                  ),
 
-              ],
-            );
-          },
-        );
+                ],
+              );
+            },
+          );
 
-      },
-      child: Widgets().arabicText(
-        text: 'تسجيل الخروج',
-        fontSize: Spaces().mediumSize,
-        color: Pallet().red_R,
+        },
+        leading: RotatedBox(
+            quarterTurns: 2,
+            child: Icon(Icons.exit_to_app,
+              color: Pallet().red_R,
+            )
+        ),
+        title: Widgets().arabicText(
+          text: 'تسجيل الخروج',
+          fontSize: Spaces().mediumSize,
+          color: Pallet().red_R,
+        ),
       ),
     );
   }

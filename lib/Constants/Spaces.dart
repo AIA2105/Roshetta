@@ -8,5 +8,5 @@ class Spaces{
   double sizedBoxHeight = 20;
   double bigTitleSize = 22;
   double padding = 15;
-  double backButton = 30;
+  double biggest = 30;
 }

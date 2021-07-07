@@ -1,12 +1,10 @@
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:roshetta/AI/camera.dart';
-import 'package:roshetta/Constants/Links.dart';
 import 'package:roshetta/Constants/Pallet.dart';
 import 'package:roshetta/Constants/Spaces.dart';
-import 'package:roshetta/Constants/Strings.dart';
 import 'package:roshetta/Pages/Patient/PatientDatabase.dart';
-import 'package:roshetta/Widgets/DeleteAccount.dart';
 import 'package:roshetta/Widgets/EditAccount.dart';
 import 'package:roshetta/Widgets/ExitAccount.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
@@ -59,39 +57,36 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
               backgroundColor:Pallet().background_R,
               appBar: AppBar(
                 centerTitle: true,
-                backgroundColor: Color(0xFF33CFE8),
+                backgroundColor: Pallet().blue_R,
                 title: Widgets().screenTitle('الصفحة الرئيسية للمريض',Pallet().white_R)
               ),
               body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Widgets().profilePicture(FirebaseAuth.instance.currentUser.uid, patient.profileImage),
-                    Container(
-                      alignment: Alignment.center,
-                      child: Widgets().arabicText(
-                          text:'مرحبا بك ${patient.firstName}',
-                          fontSize:Spaces().bigTitleSize,
-                          color: Pallet().red_R,
-                          textDirection: TextDirection.rtl
-                      ),
-                    ),
-                  ],
-                ),
+                child: Text('HI !')
               ),
-              drawer: Drawer(
-                  child: Center(
+              drawer: ClipRRect(
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(180)),
+                child: Drawer(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        EditAccount(patient),
-                        SizedBox(height: Spaces().mediumSize,),
+                        SizedBox(height: 100,),
+                        EditAccount(FirebaseAuth.instance.currentUser.uid ,patient.profileImage, patient),
+                        Widgets().arabicText(
+                            text:'${patient.firstName} ${patient.lastName}',
+                            fontSize:Spaces().bigTitleSize,
+                            color: Pallet().red_R,
+                            textDirection: TextDirection.rtl
+                        ),
+                        SizedBox(height: 100,),
+
+                        Expanded(child:Container()),
+                        /////////////////////////
+
                         ExitAccount(),
-                        SizedBox(height: Spaces().mediumSize,),
-                        DeleteAccount(),
                       ],
-                    ),
-                  )),
+                    )),
+              ),
             );  // snapshot.data  :- get your object which is pass from your downloadData() function
         }
       },

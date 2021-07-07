@@ -60,35 +60,32 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen> {
                 title: Widgets().screenTitle('الصفحة الرئيسية للصيدلي',Pallet().white_R)
               ),
               body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Widgets().profilePicture(FirebaseAuth.instance.currentUser.uid, pharmacy.profileImage),
-                    Container(
-                      alignment: Alignment.center,
-                      child: Widgets().arabicText(
-                          text:'مرحبا بك ${pharmacy.firstName}',
-                          fontSize:Spaces().bigTitleSize,
-                          color: Pallet().red_R,
-                          textDirection: TextDirection.rtl
-                      ),
-                    ),
-                  ],
-                ),
+                  child: Text('HI !')
               ),
-              drawer: Drawer(
-                  child: Center(
+              drawer: ClipRRect(
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(180)),
+                child: Drawer(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        EditAccount(pharmacy),
-                        SizedBox(height: Spaces().mediumSize,),
+                        SizedBox(height: 100,),
+                        EditAccount(FirebaseAuth.instance.currentUser.uid ,pharmacy.profileImage, pharmacy),
+                        Widgets().arabicText(
+                            text:'${pharmacy.firstName} ${pharmacy.lastName}',
+                            fontSize:Spaces().bigTitleSize,
+                            color: Pallet().red_R,
+                            textDirection: TextDirection.rtl
+                        ),
+                        SizedBox(height: 100,),
+
+                        Expanded(child:Container()),
+                        /////////////////////////
+
                         ExitAccount(),
-                        SizedBox(height: Spaces().mediumSize,),
-                        DeleteAccount(),
                       ],
-                    ),
-                  )),
+                    )),
+              ),
             );  // snapshot.data  :- get your object which is pass from your downloadData() function
         }
       },

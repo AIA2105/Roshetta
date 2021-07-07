@@ -26,7 +26,10 @@ class _DeleteAccountState extends State<DeleteAccount> {
   }
   @override
   Widget build(BuildContext context) {
-    return FlatButton(
+    return RaisedButton(
+      shape: RoundedRectangleBorder(
+          borderRadius: new BorderRadius.circular(30.0)),
+      color: Pallet().red_R,
       onPressed: () async {
         showDialog(
           context: context,
@@ -75,10 +78,13 @@ class _DeleteAccountState extends State<DeleteAccount> {
         );
 
       },
-      child: Widgets().arabicText(
-        text: 'حذف الحساب',
-        fontSize: Spaces().mediumSize,
-        color: Pallet().red_R,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Widgets().arabicText(
+          text: 'حذف الحساب',
+          fontSize: Spaces().mediumSize,
+          color: Pallet().white_R,
+        ),
       ),
     );
   }

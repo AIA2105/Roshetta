@@ -10,6 +10,7 @@ import 'package:roshetta/Constants/Spaces.dart';
 import 'package:roshetta/Constants/Strings.dart';
 import 'package:roshetta/Pages/Login%20System/LoginScreen.dart';
 import 'package:roshetta/Pages/Pharmacy/Pharmacy.dart';
+import 'package:roshetta/Widgets/DeleteAccount.dart';
 import 'package:roshetta/Widgets/InputField_R.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
 import 'package:http/http.dart' as http;
@@ -312,83 +313,88 @@ class _EditPharmacyDataState extends State<EditPharmacyData> {
                   Padding(
                     padding:
                     const EdgeInsets.only(left: 5, right: 5, bottom: 50),
-                    child: ButtonTheme(
-                      minWidth: double.maxFinite,
-                      child: RaisedButton(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0)),
-                          color: Color(0xFF33CFE8),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: editData,
-                          ),
-                          onPressed: () async {
-                            ////////////////////////////////////////////////////////
-                            if (_firstNameController.text.isNotEmpty &&
-                                _lastNameController.text.isNotEmpty &&
-                                _addressController.text.isNotEmpty &&
-                                _phoneController.text.isNotEmpty &&
-                                _pharmacyNameController.text.isNotEmpty) {
+                    child: Row(
+                      children: [
+                        DeleteAccount(),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: RaisedButton(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: new BorderRadius.circular(30.0)),
+                              color: Pallet().blue_R,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: editData,
+                              ),
+                              onPressed: () async {
+                                ////////////////////////////////////////////////////////
+                                if (_firstNameController.text.isNotEmpty &&
+                                    _lastNameController.text.isNotEmpty &&
+                                    _addressController.text.isNotEmpty &&
+                                    _phoneController.text.isNotEmpty &&
+                                    _pharmacyNameController.text.isNotEmpty) {
 
-                              setState(() {
-                                editData= CircularProgressIndicator(color: Pallet().white_R,);
-                              });
-                              ////////////////////////////////////////////////////////
-                              var res= await PharmacyDatabase().update(
-                                FirebaseAuth.instance.currentUser.uid,
-                                FirebaseAuth.instance.currentUser.email,
-                                _addressController.text,
-                                _pharmacyNameController.text,
-                                _firstNameController.text,
-                                _lastNameController.text,
-                                _delivery,
-                                _hours,
-                                _phoneController.text,
-                                _image,
-                              );
-                              ////////////////////////////////////////////////////////
-                              print(res);
-
-                              if(res=='false'){
-                                setState(() {
-                                  editData= Widgets().arabicText(
-                                    text: 'تعديل',
-                                    fontSize: Spaces().mediumSize,
-                                    color: Pallet().white_R,
+                                  setState(() {
+                                    editData= CircularProgressIndicator(color: Pallet().white_R,);
+                                  });
+                                  ////////////////////////////////////////////////////////
+                                  var res= await PharmacyDatabase().update(
+                                    FirebaseAuth.instance.currentUser.uid,
+                                    FirebaseAuth.instance.currentUser.email,
+                                    _addressController.text,
+                                    _pharmacyNameController.text,
+                                    _firstNameController.text,
+                                    _lastNameController.text,
+                                    _delivery,
+                                    _hours,
+                                    _phoneController.text,
+                                    _image,
                                   );
-                                });
+                                  ////////////////////////////////////////////////////////
+                                  print(res);
 
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    Widgets().snakBar(
-                                        text: 'حدثت مشكلة برجاء المحاولة لاحقاََ',
-                                        background: Pallet().red_R,
-                                        duration: 2));
-                                //
+                                  if(res=='false'){
+                                    setState(() {
+                                      editData= Widgets().arabicText(
+                                        text: 'تعديل',
+                                        fontSize: Spaces().mediumSize,
+                                        color: Pallet().white_R,
+                                      );
+                                    });
 
-                              }else{
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => PharmacyHomeScreen()),
-                                );
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    Widgets().snakBar(
-                                        text: 'تم تعديل البيانات بنجاح',
-                                        background: Pallet().green,
-                                        duration: 2));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        Widgets().snakBar(
+                                            text: 'حدثت مشكلة برجاء المحاولة لاحقاََ',
+                                            background: Pallet().red_R,
+                                            duration: 2));
+                                    //
+
+                                  }else{
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => PharmacyHomeScreen()),
+                                    );
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        Widgets().snakBar(
+                                            text: 'تم تعديل البيانات بنجاح',
+                                            background: Pallet().green,
+                                            duration: 2));
+                                  }
+                                  //
+                                }else{
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      Widgets().snakBar(
+                                          text: 'برجاء اكمال البيانات',
+                                          background: Pallet().red_R,
+                                          duration: 2));
+                                }
                               }
-                              //
-                            }else{
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  Widgets().snakBar(
-                                      text: 'برجاء اكمال البيانات',
-                                      background: Pallet().red_R,
-                                      duration: 2));
-                            }
-                          }
-                        ////////////////////////////////////////////////////////
+                            ////////////////////////////////////////////////////////
 
-                      ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
