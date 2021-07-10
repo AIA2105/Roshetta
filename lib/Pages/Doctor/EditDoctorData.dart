@@ -30,8 +30,24 @@ class _EditDoctorDataState extends State<EditDoctorData> {
   TextEditingController _lastNameController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   TextEditingController _phoneController = TextEditingController();
-  String _birthday, _gender;
-  TextEditingController _masterController = TextEditingController();
+  String _birthday, _gender, _master;
+  List _masters = [
+    'جراحة العظام',
+    'جراحة عامة',
+    'أمراض قلب',
+    'جراحة تجميلية',
+    'أطفال',
+    'باطنة',
+    'أسنان',
+    'نفسية',
+    'عيون',
+    'انف وأذن',
+    'علاج طبيعي',
+    'مسالك بولية',
+    'نسا وتوليد',
+    'جلدية',
+    'ذكورة وعقم',
+    'غير ذلك'];
   TextEditingController _hospitalController = TextEditingController();
   List _genders = ['ذكر', 'أنثى'];
   File _image;
@@ -75,7 +91,7 @@ class _EditDoctorDataState extends State<EditDoctorData> {
       _lastNameController.text=widget.doctor.lastName;
       _addressController.text=widget.doctor.address;
       _phoneController.text=widget.doctor.phoneNumber;
-      _masterController.text=widget.doctor.master;
+      _master=widget.doctor.master;
       _hospitalController.text=widget.doctor.hospital;
       _birthday=widget.doctor.birthday;
       _gender=widget.doctor.gender;
@@ -101,7 +117,7 @@ class _EditDoctorDataState extends State<EditDoctorData> {
       backgroundColor: Pallet().background_R,
       appBar: AppBar(
           leading: IconButton(
-              icon: Widgets().backArrowIcon(),
+              icon: Widgets().backArrowIcon(Pallet().blue_R),
               onPressed: () async{
                 Navigator.pop(context);
               }
@@ -280,7 +296,7 @@ class _EditDoctorDataState extends State<EditDoctorData> {
                                 child: Padding(
                                     padding:
                                     EdgeInsets.only(left: 8, bottom: 8),
-                                    child: Widgets().datePicker(_birthday,context,
+                                    child: Widgets().datePicker(_birthday,'تاريخ الميلاد',context,
                                             (DateTime value) {
                                           _birthday =
                                           '${value.year}-${value.month}-${value.day}';
@@ -290,15 +306,16 @@ class _EditDoctorDataState extends State<EditDoctorData> {
                             ],
                           ),
 
-                          InputField_R(
-                            title: Widgets().arabicText(
-                                text: 'التخصص',
-                                fontSize: Spaces().smallSize,
-                                color: Pallet().blue_R),
-                            textAlign: TextAlign.right,
-                            textEditingController: _masterController,
-                            textInputType: TextInputType.text,
-                            secure: false,
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: Widgets().dropDownButton(
+                                'التخصص', _master, _masters, (val) {
+                              setState(
+                                    () {
+                                  _master = val;
+                                },
+                              );
+                            }),
                           ),
                           InputField_R(
                             title: Widgets().arabicText(
@@ -341,7 +358,7 @@ class _EditDoctorDataState extends State<EditDoctorData> {
                                     _addressController.text.isNotEmpty &&
                                     _phoneController.text.isNotEmpty &&
                                     _birthday.isNotEmpty &&
-                                    _masterController.text.isNotEmpty &&
+                                    _master.isNotEmpty &&
                                     _hospitalController.text.isNotEmpty) {
 
                                   setState(() {
@@ -355,7 +372,7 @@ class _EditDoctorDataState extends State<EditDoctorData> {
                                     _firstNameController.text,
                                     _lastNameController.text,
                                     _birthday,
-                                    _masterController.text,
+                                    _master,
                                     _hospitalController.text,
                                     _gender,
                                     _phoneController.text,

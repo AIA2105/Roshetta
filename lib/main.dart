@@ -18,7 +18,7 @@ void main() async {
 
   // runApp(MaterialApp(
   //   title: 'Roshetta',
-  //   home: NewPatientData(),
+  //   home: LocalPrescriptions(),
   // ));
 
   bool result = await InternetConnectionChecker().hasConnection;

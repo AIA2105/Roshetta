@@ -32,7 +32,7 @@ class _newUserState extends State<newUser> {
       backgroundColor:Pallet().background_R,
       appBar: AppBar(
           leading: IconButton(
-            icon: Widgets().backArrowIcon(),
+            icon: Widgets().backArrowIcon(Pallet().blue_R),
             onPressed: () => Navigator.of(context).pop(),
           ),
           elevation: 0,

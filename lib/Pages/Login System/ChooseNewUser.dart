@@ -28,7 +28,7 @@ class _ChooseNewUserState extends State<ChooseNewUser> {
       backgroundColor:Pallet().background_R,
       appBar: AppBar(
         leading: IconButton(
-          icon: Widgets().backArrowIcon(),
+          icon: Widgets().backArrowIcon(Pallet().blue_R),
           onPressed: () async{
             var delAuth = await FirebaseAuth.instance.currentUser.delete();
             Navigator.pushReplacement(context,

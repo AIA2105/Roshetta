@@ -54,7 +54,7 @@ class _NewPharmacyDataState extends State<NewPharmacyData> {
       backgroundColor: Pallet().background_R,
       appBar: AppBar(
           leading: IconButton(
-              icon: Widgets().backArrowIcon(),
+              icon: Widgets().backArrowIcon(Pallet().blue_R),
               onPressed: () async{
                 var delData = await FirebaseFirestore.instance.collection(Strings().fireStoreTableName).doc(FirebaseAuth.instance.currentUser.uid).delete();
                 var delAuth = await FirebaseAuth.instance.currentUser.delete();

@@ -64,7 +64,7 @@ class _NewPatientDataState extends State<NewPatientData> {
       backgroundColor: Pallet().background_R,
       appBar: AppBar(
           leading: IconButton(
-            icon: Widgets().backArrowIcon(),
+            icon: Widgets().backArrowIcon(Pallet().blue_R),
             onPressed: () async {
               if(FirebaseAuth.instance.currentUser!=null){
                 await deleteAcc();
@@ -260,7 +260,7 @@ class _NewPatientDataState extends State<NewPatientData> {
                                 child: Padding(
                                     padding:
                                         EdgeInsets.only(left: 8, bottom: 8),
-                                    child: Widgets().datePicker('',context,
+                                    child: Widgets().datePicker('','تاريخ الميلاد',context,
                                         (DateTime value) {
                                       _birthday =
                                           '${value.year}-${value.month}-${value.day}';
@@ -318,8 +318,7 @@ class _NewPatientDataState extends State<NewPatientData> {
                     height: 50,
                   )),
                   Padding(
-                    padding:
-                        const EdgeInsets.only(left: 5, right: 5, bottom: 50),
+                    padding: const EdgeInsets.only(left: 5, right: 5, bottom: 50),
                     child: ButtonTheme(
                       minWidth: double.maxFinite,
                       child: RaisedButton(

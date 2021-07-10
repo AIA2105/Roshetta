@@ -99,7 +99,7 @@ class _EditPharmacyDataState extends State<EditPharmacyData> {
       backgroundColor: Pallet().background_R,
       appBar: AppBar(
           leading: IconButton(
-              icon: Widgets().backArrowIcon(),
+              icon: Widgets().backArrowIcon(Pallet().blue_R),
               onPressed: () async{
                 Navigator.pop(context);
               }

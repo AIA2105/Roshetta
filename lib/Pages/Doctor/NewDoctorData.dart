@@ -25,8 +25,24 @@ class _NewDoctorDataState extends State<NewDoctorData> {
   TextEditingController _lastNameController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   TextEditingController _phoneController = TextEditingController();
-  String _birthday, _gender;
-  TextEditingController _masterController = TextEditingController();
+  String _birthday, _gender, _master;
+  List _masters = [
+    'جراحة العظام',
+    'جراحة عامة',
+    'أمراض قلب',
+    'جراحة تجميلية',
+    'أطفال',
+    'باطنة',
+    'أسنان',
+    'نفسية',
+    'عيون',
+    'انف وأذن',
+    'علاج طبيعي',
+    'مسالك بولية',
+    'نسا وتوليد',
+    'جلدية',
+    'ذكورة وعقم',
+    'غير ذلك'];
   TextEditingController _hospitalController = TextEditingController();
   List _genders = ['ذكر', 'أنثى'];
   File _image;
@@ -55,7 +71,7 @@ class _NewDoctorDataState extends State<NewDoctorData> {
       backgroundColor: Pallet().background_R,
       appBar: AppBar(
           leading: IconButton(
-            icon: Widgets().backArrowIcon(),
+            icon: Widgets().backArrowIcon(Pallet().blue_R),
             onPressed: () async{
               var delData = await FirebaseFirestore.instance.collection(Strings().fireStoreTableName).doc(FirebaseAuth.instance.currentUser.uid).delete();
               var delAuth = await FirebaseAuth.instance.currentUser.delete();
@@ -232,7 +248,7 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                 child: Padding(
                                     padding:
                                         EdgeInsets.only(left: 8, bottom: 8),
-                                    child: Widgets().datePicker('',context,
+                                    child: Widgets().datePicker('','تاريخ الميلاد',context,
                                         (DateTime value) {
                                       _birthday =
                                           '${value.year}-${value.month}-${value.day}';
@@ -242,15 +258,16 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                             ],
                           ),
 
-                          InputField_R(
-                            title: Widgets().arabicText(
-                                text: 'التخصص',
-                                fontSize: Spaces().smallSize,
-                                color: Pallet().blue_R),
-                            textAlign: TextAlign.right,
-                            textEditingController: _masterController,
-                            textInputType: TextInputType.text,
-                            secure: false,
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: Widgets().dropDownButton(
+                                'التخصص', _master, _masters, (val) {
+                              setState(
+                                    () {
+                                  _master = val;
+                                },
+                              );
+                            }),
                           ),
                           InputField_R(
                             title: Widgets().arabicText(
@@ -291,7 +308,7 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                 _addressController.text.isNotEmpty &&
                                 _phoneController.text.isNotEmpty &&
                                 _birthday.isNotEmpty &&
-                                _masterController.text.isNotEmpty &&
+                                _master.isNotEmpty &&
                                 _hospitalController.text.isNotEmpty) {
 
                               setState(() {
@@ -305,7 +322,7 @@ class _NewDoctorDataState extends State<NewDoctorData> {
                                   _firstNameController.text,
                                   _lastNameController.text,
                                   _birthday,
-                                  _masterController.text,
+                                  _master != null ? _master : _masters[0],
                                   _hospitalController.text,
                                   _gender != null ? _gender : _genders[0],
                                   _phoneController.text,

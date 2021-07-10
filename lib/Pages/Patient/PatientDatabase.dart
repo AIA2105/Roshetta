@@ -135,6 +135,26 @@ class PatientDatabase {
         patientData.add(Patient.fromJson(json));
       }
     }
+    print('Patient Data get Successful');
     return patientData[0];
   }
+
+   dashboard(String id) async {
+     var request = http.MultipartRequest("GET", Uri.parse('${Links().patientDashboard}/id=$id'));
+     var response = await request.send();
+     var responseData = await response.stream.toBytes();
+     var responseString = String.fromCharCodes(responseData);
+     print('Patient dashboard get successful');
+     return responseString;
+   }
+
+   notification(String id) async {
+     var request = http.MultipartRequest("GET", Uri.parse('${Links().patientNotification}/id=$id'));
+     var response = await request.send();
+     var responseData = await response.stream.toBytes();
+     var responseString = String.fromCharCodes(responseData);
+     print('Patient notification= $responseString');
+     return responseString;
+   }
+
 }

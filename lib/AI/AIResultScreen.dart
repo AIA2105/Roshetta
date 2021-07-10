@@ -23,7 +23,7 @@ class _AIResultScreenState extends State<AIResultScreen> {
       backgroundColor: Pallet().background_R,
       appBar:  AppBar(
           leading: IconButton(
-            icon: Widgets().backArrowIcon(),
+            icon: Widgets().backArrowIcon(Pallet().blue_R),
             onPressed: () => Navigator.of(context).pop(),
           ),
           elevation: 0,

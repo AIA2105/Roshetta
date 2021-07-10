@@ -1,12 +1,12 @@
 import 'package:image_cropper/image_cropper.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:roshetta/AI/PrescriptionDatabase.dart';
+import 'package:roshetta/AI/ScanPrescription.dart';
 import 'dart:io';
 import 'package:roshetta/Constants/Pallet.dart';
 import 'package:roshetta/AI/AIResultScreen.dart';
+import 'package:roshetta/Pages/Patient/PatientHomeScreen.dart';
 import '../Constants/Spaces.dart';
 import '../Widgets/Widgets.dart';
 
@@ -72,8 +72,14 @@ class _CameraState extends State<Camera> {
       backgroundColor: Pallet().background_R,
       appBar: AppBar(
           leading: IconButton(
-            icon: Widgets().backArrowIcon(),
-            onPressed: () => Navigator.of(context).pop(),
+            icon: Widgets().backArrowIcon(Pallet().blue_R),
+            onPressed: (){
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>PatientHomeScreen())
+              );
+            },
           ),
           elevation: 0,
           centerTitle: true,
@@ -144,7 +150,8 @@ class _CameraState extends State<Camera> {
                     setState(() {
                       progress= CircularProgressIndicator(color: Pallet().white_R,);
                     });
-                    String result= await PrescriptionDatabase().postPrescription(FirebaseAuth.instance.currentUser.uid, _image);
+                    String result= await ScanPrescription().postPrescription(_image);
+                    // String result= await ScanPrescription().postPrescription(FirebaseAuth.instance.currentUser.uid, _image);
                     finalResult= result;
                     if(finalResult!='AI Server is Off'){
                       Navigator.pushReplacement(context,

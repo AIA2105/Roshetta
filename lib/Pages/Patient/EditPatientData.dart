@@ -106,9 +106,13 @@ class _EditPatientDataState extends State<EditPatientData> {
       backgroundColor: Pallet().background_R,
       appBar: AppBar(
           leading: IconButton(
-            icon: Widgets().backArrowIcon(),
+            icon: Widgets().backArrowIcon(Pallet().blue_R),
             onPressed: () async {
-              Navigator.pop(context);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>PatientHomeScreen())
+              );
             }
           ),
           elevation: 0,
@@ -302,7 +306,7 @@ class _EditPatientDataState extends State<EditPatientData> {
                                 child: Padding(
                                     padding:
                                     EdgeInsets.only(left: 8, bottom: 8),
-                                    child: Widgets().datePicker(_birthday,context,
+                                    child: Widgets().datePicker(_birthday,'تاريخ الميلاد',context,
                                             (DateTime value) {
                                           _birthday =
                                           '${value.year}-${value.month}-${value.day}';

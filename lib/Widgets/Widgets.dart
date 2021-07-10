@@ -1,4 +1,5 @@
 import 'package:date_field/date_field.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:roshetta/Constants/Links.dart';
 import 'package:roshetta/Constants/Pallet.dart';
@@ -70,14 +71,14 @@ class Widgets {
     );
   }
 
-  Widget datePicker(String hint, BuildContext context, Function function) {
+  Widget datePicker(String hint,String title, BuildContext context, Function function) {
     return Column(
       children: [
         Container(
           padding: EdgeInsets.only(right: 15),
           width: double.maxFinite,
           child: Widgets().arabicText(
-              fontSize: 18, color: Pallet().blue_R, text: 'تاريخ الميلاد'),
+              fontSize: 18, color: Pallet().blue_R, text: title),
         ),
         Theme(
           data: ThemeData.light().copyWith(
@@ -91,10 +92,12 @@ class Widgets {
             ),
           ),
           child: DateTimeFormField(
+
             firstDate: DateTime(1900),
             lastDate: DateTime.now(),
             dateTextStyle: TextStyle(fontSize: Spaces().smallSize),
             decoration: InputDecoration(
+                hintTextDirection: TextDirection.rtl,
                 contentPadding: const EdgeInsets.symmetric(vertical: 12),
                 fillColor: Pallet().white_R,
                 filled: true,
@@ -145,18 +148,20 @@ class Widgets {
           ),
           isExpanded: true,
           hint: hint == null
-              ? Center(
-                  child: Widgets().arabicText(
-                      text: values[0],
-                      fontSize: Spaces().smallSize,
-                      color: Pallet().blue_R),
-                )
-              : Center(
-                  child: Widgets().arabicText(
-                      text: hint,
-                      fontSize: Spaces().smallSize,
-                      color: Pallet().blue_R),
-                ),
+              ? Align(
+                alignment: Alignment.centerRight,
+                child: Widgets().arabicText(
+                    text: values[0],
+                    fontSize: Spaces().smallSize,
+                    color: Pallet().blue_R),
+              )
+              : Align(
+                alignment: Alignment.centerRight,
+                child: Widgets().arabicText(
+                    text: hint,
+                    fontSize: Spaces().smallSize,
+                    color: Pallet().blue_R),
+              ),
           iconSize: 30.0,
           style: TextStyle(color: Pallet().blue_R),
           items: values.map(
@@ -229,10 +234,10 @@ class Widgets {
     );
   }
 
-  Widget backArrowIcon() {
+  Widget backArrowIcon(Color color) {
     return Icon(
       Icons.arrow_back_ios,
-      color: Pallet().blue_R,
+      color: color,
       size: Spaces().biggest,
     );
   }

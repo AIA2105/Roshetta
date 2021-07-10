@@ -6,5 +6,6 @@ class Pallet {
   Color blue_R = Color(0xFF33CFE8);
   Color white_R = Color(0xFFFFFFFF);
   Color green = Colors.green;
+  Color black = Colors.black54;
 
 }
