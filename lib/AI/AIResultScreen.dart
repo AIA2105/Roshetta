@@ -48,10 +48,12 @@ class _AIResultScreenState extends State<AIResultScreen> {
                       color: Pallet().white_R,
                       child: ListView(
                         children: [
-                          Center(
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
                             child: Widgets().arabicText(
+                              textDirection: TextDirection.ltr,
                               text: widget.result,
-                              fontSize: 48,
+                              fontSize: 38,
                               color: Pallet().red_R,
                             ),
                           )

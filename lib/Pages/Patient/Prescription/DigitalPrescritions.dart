@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +6,7 @@ import 'package:roshetta/Constants/Pallet.dart';
 import 'package:roshetta/Constants/Spaces.dart';
 import 'package:roshetta/Widgets/InputField_R.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
+import '../../../main.dart';
 import '../PatientHomeScreen.dart';
 import 'DigitalPrescription.dart';
 import 'DigitalPrescriptionDetails.dart';
@@ -19,8 +19,8 @@ class DigitalPrescriptions extends StatefulWidget {
 }
 
 class _DigitalPrescriptionsState extends State<DigitalPrescriptions> {
-  bool searchFlag=false;
-  bool filterFlag= false;
+  bool searchFlag = false;
+  bool filterFlag = false;
   List<DigitalPrescription> prescriptionList = [];
   TextEditingController _doctorName = new TextEditingController();
   String currentMaster;
@@ -41,26 +41,29 @@ class _DigitalPrescriptionsState extends State<DigitalPrescriptions> {
     'نسا وتوليد',
     'جلدية',
     'ذكورة وعقم',
-    'غير ذلك'];
+    'غير ذلك'
+  ];
 
   Future<String> downloadData() async {
-    prescriptionList = await PrescriptionDatabase().getDigital(FirebaseAuth.instance.currentUser.uid);
+    prescriptionList = await PrescriptionDatabase()
+        .getDigital(FirebaseAuth.instance.currentUser.uid);
     return Future.value("Data download successfully");
     // return your response
   }
 
   Future<String> search(String name, String patientId) async {
-    prescriptionList = await PrescriptionDatabase().searchDigital(name,patientId);
+    prescriptionList =
+        await PrescriptionDatabase().searchDigital(name, patientId);
     print(prescriptionList.length);
     return Future.value("Data download successfully");
   }
 
   Future<String> filter(String filter, String patientId) async {
-    prescriptionList = await PrescriptionDatabase().filterDigital(filter, patientId);
+    prescriptionList =
+        await PrescriptionDatabase().filterDigital(filter, patientId);
     print(prescriptionList.length);
     return Future.value("Data download successfully");
   }
-
 
   @override
   void initState() {
@@ -71,37 +74,72 @@ class _DigitalPrescriptionsState extends State<DigitalPrescriptions> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
-      future: searchFlag?search(_doctorName.text, FirebaseAuth.instance.currentUser.uid):filterFlag?filter(currentMaster, FirebaseAuth.instance.currentUser.uid):downloadData(),
-      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
-            backgroundColor: Pallet().background_R,
-            body: Center(
-                child: CircularProgressIndicator(
-                  color: Pallet().blue_R,
-                )),
-          );
-        } else {
-          if (snapshot.hasError)
+        future: searchFlag
+            ? search(_doctorName.text, FirebaseAuth.instance.currentUser.uid)
+            : filterFlag
+                ? filter(currentMaster, FirebaseAuth.instance.currentUser.uid)
+                : downloadData(),
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return Scaffold(
               backgroundColor: Pallet().background_R,
-              body: Center(child: Text('Error: ${snapshot.error}')),
+              body: Center(
+                  child: CircularProgressIndicator(
+                color: Pallet().blue_R,
+              )),
             );
-          else {
+          } else if (snapshot.hasError) {
+            return Scaffold(
+              floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+              floatingActionButton: FloatingActionButton.extended(
+                label: Widgets().arabicText(
+                    text: 'حدثت مشكلة اضغط لإعادة المحاولة',
+                    color: Pallet().white_R,
+                    fontSize: Spaces().smallestSize),
+                backgroundColor: Pallet().red_R,
+                onPressed: (){
+                  main();
+                  print(snapshot.error);
+                  },
+                icon: Icon(Icons.refresh),
+              ),
+              body: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage("images/background.png"),
+                    fit: BoxFit.fitHeight,
+                  ),
+                ),
+                child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset('images/logo.png'),
+                        Widgets().arabicText(
+                            text: 'روشتة',
+                            color: Pallet().red_R,
+                            fontSize: Spaces().bigTitleSize),
+                      ],
+                    )),
+              ),
+            ) ;
+          } else {
             return Scaffold(
               backgroundColor: Pallet().background_R,
               appBar: AppBar(
                   actions: [
                     InkWell(
-                        onTap: (){
+                        onTap: () {
                           showDialog(
                             context: context,
                             builder: (BuildContext context) {
                               return AlertDialog(
                                 elevation: 0,
                                 backgroundColor: Colors.transparent,
-                                titlePadding: EdgeInsets.only(right: 30,left: 30,top: 10),
-                                actionsPadding: EdgeInsets.only(right: 30,left: 30,top: 10),
+                                titlePadding: EdgeInsets.only(
+                                    right: 30, left: 30, top: 10),
+                                actionsPadding: EdgeInsets.only(
+                                    right: 30, left: 30, top: 10),
                                 title: InputField_R(
                                     textAlign: TextAlign.right,
                                     title: Widgets().arabicText(
@@ -116,34 +154,37 @@ class _DigitalPrescriptionsState extends State<DigitalPrescriptions> {
                                 actions: [
                                   RaisedButton(
                                     shape: RoundedRectangleBorder(
-                                        borderRadius: new BorderRadius.circular(30.0)),
+                                        borderRadius:
+                                            new BorderRadius.circular(30.0)),
                                     color: Pallet().blue_R,
                                     child: Widgets().arabicText(
                                       text: 'الكل',
                                       fontSize: 20,
                                       color: Pallet().white_R,
                                     ),
-                                    onPressed:  (){
+                                    onPressed: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => DigitalPrescriptions()),
+                                            builder: (context) =>
+                                                DigitalPrescriptions()),
                                       );
                                     },
                                   ),
                                   RaisedButton(
                                     shape: RoundedRectangleBorder(
-                                        borderRadius: new BorderRadius.circular(30.0)),
+                                        borderRadius:
+                                            new BorderRadius.circular(30.0)),
                                     color: Pallet().red_R,
                                     child: Widgets().arabicText(
                                       text: 'بحث',
                                       fontSize: 20,
                                       color: Pallet().white_R,
                                     ),
-                                    onPressed:  (){
-                                      setState((){
-                                        searchFlag=true;
-                                        filterFlag=false;
+                                    onPressed: () {
+                                      setState(() {
+                                        searchFlag = true;
+                                        filterFlag = false;
                                         Navigator.pop(context);
                                       });
                                     },
@@ -152,10 +193,9 @@ class _DigitalPrescriptionsState extends State<DigitalPrescriptions> {
                               );
                             },
                           );
-
                         },
                         child: Padding(
-                          padding: EdgeInsets.only(right: 10,left: 10),
+                          padding: EdgeInsets.only(right: 10, left: 10),
                           child: Icon(
                             Icons.search,
                             color: Pallet().blue_R,
@@ -163,18 +203,21 @@ class _DigitalPrescriptionsState extends State<DigitalPrescriptions> {
                           ),
                         )),
                     InkWell(
-                        onTap: (){
+                        onTap: () {
                           showDialog(
                             context: context,
                             builder: (BuildContext context) {
                               return ListView.builder(
-                                  itemCount:_masters.length ,
+                                  itemCount: _masters.length,
                                   scrollDirection: Axis.horizontal,
                                   itemBuilder: (context, index) {
                                     return Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 0.8,vertical: 60),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 0.8, vertical: 60),
                                       child: GestureDetector(
-                                        onTap: (){Navigator.pop(context);},
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                        },
                                         child: Material(
                                           color: Colors.transparent,
                                           child: Wrap(
@@ -182,25 +225,31 @@ class _DigitalPrescriptionsState extends State<DigitalPrescriptions> {
                                               InkWell(
                                                 child: Card(
                                                   shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(20.0)),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20.0)),
                                                   child: Widgets().arabicText(
-                                                      text: '  ${_masters[index]}  ',
-                                                      fontSize: Spaces().mediumSize,
+                                                      text:
+                                                          '  ${_masters[index]}  ',
+                                                      fontSize:
+                                                          Spaces().mediumSize,
                                                       color: Pallet().blue_R),
                                                 ),
-                                                onTap: (){
-                                                  if(_masters[index]=='كل التخصصات'){
+                                                onTap: () {
+                                                  if (_masters[index] ==
+                                                      'كل التخصصات') {
                                                     Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
-                                                          builder: (context) => DigitalPrescriptions()),
+                                                          builder: (context) =>
+                                                              DigitalPrescriptions()),
                                                     );
-                                                  }
-                                                  else{
+                                                  } else {
                                                     setState(() {
-                                                      currentMaster=_masters[index];
-                                                      filterFlag=true;
-                                                      searchFlag=false;
+                                                      currentMaster =
+                                                          _masters[index];
+                                                      filterFlag = true;
+                                                      searchFlag = false;
                                                       Navigator.pop(context);
                                                     });
                                                   }
@@ -211,21 +260,18 @@ class _DigitalPrescriptionsState extends State<DigitalPrescriptions> {
                                         ),
                                       ),
                                     );
-                                  }
-                              );
+                                  });
                             },
                           );
                         },
                         child: Padding(
-                          padding: EdgeInsets.only(right: 10,left: 10),
+                          padding: EdgeInsets.only(right: 10, left: 10),
                           child: Icon(
                             Icons.filter_list_rounded,
                             color: Pallet().blue_R,
                             size: 30,
                           ),
-                        )
-                    )
-
+                        ))
                   ],
                   leading: IconButton(
                       icon: Widgets().backArrowIcon(Pallet().blue_R),
@@ -233,16 +279,16 @@ class _DigitalPrescriptionsState extends State<DigitalPrescriptions> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>PatientHomeScreen())
-                        );
+                                builder: (context) => PatientHomeScreen()));
                       }),
                   centerTitle: true,
                   backgroundColor: Pallet().background_R,
                   elevation: 0,
-                  title: Widgets().screenTitle('روشتاتي المستلمة', Pallet().blue_R)
-              ),
+                  title: Widgets()
+                      .screenTitle('روشتاتي المستلمة', Pallet().blue_R)),
               body: Padding(
-                padding:EdgeInsets.only(left: 16, right: 16, top: 50, bottom: 30),
+                padding:
+                    EdgeInsets.only(left: 16, right: 16, top: 50, bottom: 30),
                 child: Card(
                   elevation: 6,
                   shape: RoundedRectangleBorder(
@@ -252,73 +298,88 @@ class _DigitalPrescriptionsState extends State<DigitalPrescriptions> {
                       Expanded(
                         child: ListView.builder(
                             itemBuilder: (context, index) {
-                              return prescriptionList.length==0?Container():Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 10, right: 10, top: 5, bottom: 5),
-                                child: InkWell(
-                                  highlightColor: Pallet().blue_R,
-                                  borderRadius: BorderRadius.circular(80.0),
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                DigitalPrescriptionDetails(
-                                                    prescriptionList[index])));
-                                  },
-                                  child: Card(
-                                    elevation: 0.5,
-                                    color: Pallet().background_R,
-                                    shape: RoundedRectangleBorder(
+                              return prescriptionList.length == 0
+                                  ? Container()
+                                  : Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 10,
+                                          right: 10,
+                                          top: 5,
+                                          bottom: 5),
+                                      child: InkWell(
+                                        highlightColor: Pallet().blue_R,
                                         borderRadius:
-                                        BorderRadius.circular(80.0)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 22, vertical: 10),
-                                      child: Row(
-                                        children: [
-                                          CircleAvatar(
-                                            radius: 35,
-                                            backgroundColor: Pallet().blue_R,
-                                            child: CircleAvatar(
-                                                radius: 30,
-                                                backgroundColor:
-                                                Pallet().white_R,
-                                                child: ClipOval(
-                                                    child: Container(
-                                                      height: 100,
-                                                      width: 100,
-                                                      child: Center(
-                                                        child: Widgets().arabicText(
-                                                          text: 'RX',
-                                                          fontSize: 22,
-                                                          color: Pallet().blue_R,
-                                                        ),
-                                                      ),
-                                                    ))),
-                                          ),
-                                          Expanded(
-                                            child: Column(
+                                            BorderRadius.circular(80.0),
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      DigitalPrescriptionDetails(
+                                                          prescriptionList[
+                                                              index])));
+                                        },
+                                        child: Card(
+                                          elevation: 0.5,
+                                          color: Pallet().background_R,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(80.0)),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 22, vertical: 10),
+                                            child: Row(
                                               children: [
-                                                Widgets().arabicText(
-                                                  text: '${prescriptionList[index].doctorFirstName} ${prescriptionList[index].doctorLastName}',
-                                                  fontSize: Spaces().mediumSize,
-                                                  color: Pallet().blue_R,
+                                                CircleAvatar(
+                                                  radius: 35,
+                                                  backgroundColor:
+                                                      Pallet().blue_R,
+                                                  child: CircleAvatar(
+                                                      radius: 30,
+                                                      backgroundColor:
+                                                          Pallet().white_R,
+                                                      child: ClipOval(
+                                                          child: Container(
+                                                        height: 100,
+                                                        width: 100,
+                                                        child: Center(
+                                                          child: Widgets()
+                                                              .arabicText(
+                                                            text: 'RX',
+                                                            fontSize: 22,
+                                                            color:
+                                                                Pallet().blue_R,
+                                                          ),
+                                                        ),
+                                                      ))),
                                                 ),
-                                                Widgets().arabicText(
-                                                  text: prescriptionList[index].prescriptionDate,
-                                                  fontSize: Spaces().mediumSize,
-                                                  color: Pallet().black,
+                                                Expanded(
+                                                  child: Column(
+                                                    children: [
+                                                      Widgets().arabicText(
+                                                        text:
+                                                            '${prescriptionList[index].doctorFirstName} ${prescriptionList[index].doctorLastName}',
+                                                        fontSize:
+                                                            Spaces().mediumSize,
+                                                        color: Pallet().blue_R,
+                                                      ),
+                                                      Widgets().arabicText(
+                                                        text: prescriptionList[
+                                                                index]
+                                                            .prescriptionDate,
+                                                        fontSize:
+                                                            Spaces().mediumSize,
+                                                        color: Pallet().black,
+                                                      )
+                                                    ],
+                                                  ),
                                                 )
                                               ],
                                             ),
-                                          )
-                                        ],
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                ),
-                              );
+                                    );
                             },
                             itemCount: prescriptionList.length),
                       )
@@ -327,7 +388,7 @@ class _DigitalPrescriptionsState extends State<DigitalPrescriptions> {
                 ),
               ),
               floatingActionButtonLocation:
-              FloatingActionButtonLocation.miniCenterDocked,
+                  FloatingActionButtonLocation.miniCenterDocked,
               floatingActionButton: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -339,8 +400,7 @@ class _DigitalPrescriptionsState extends State<DigitalPrescriptions> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => Camera()),
+                          MaterialPageRoute(builder: (context) => Camera()),
                         );
                       },
                       backgroundColor: Pallet().blue_R,
@@ -357,8 +417,6 @@ class _DigitalPrescriptionsState extends State<DigitalPrescriptions> {
               ),
             );
           }
-        }
-      },
-    );
+        });
   }
 }

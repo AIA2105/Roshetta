@@ -53,10 +53,16 @@ class _ExitAccountState extends State<ExitAccount> {
                   ),
                   onPressed:  () async{
                     var user= FirebaseAuth.instance.currentUser;
-                    var result = await FirebaseAuth.instance.signOut();
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => LoginScreen()));
-                    print('exit Account');
+                    var result = await FirebaseAuth.instance.signOut().then((value){
+                      Navigator.of(context)
+                          .pushAndRemoveUntil(
+                        CupertinoPageRoute(
+                            builder: (context) => LoginScreen()
+                        ),
+                            (_) => false,
+                      );
+                      print('exit Account');
+                    });
                   },
                 ),
 

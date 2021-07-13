@@ -8,6 +8,7 @@ import 'package:roshetta/Constants/Spaces.dart';
 import 'package:roshetta/Pages/Patient/Prescription/LocalPrescriptionDetails.dart';
 import 'package:roshetta/Widgets/InputField_R.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
+import '../../../main.dart';
 import '../PatientHomeScreen.dart';
 import 'AddLocalPrescription.dart';
 import 'PrescriptionDatabase.dart';
@@ -85,9 +86,39 @@ class _LocalPrescriptionsState extends State<LocalPrescriptions> {
         } else {
           if (snapshot.hasError)
             return Scaffold(
-              backgroundColor: Pallet().background_R,
-              body: Center(child: Text('Error: ${snapshot.error}')),
-            );
+              floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+              floatingActionButton: FloatingActionButton.extended(
+                label: Widgets().arabicText(
+                    text: 'حدثت مشكلة اضغط لإعادة المحاولة',
+                    color: Pallet().white_R,
+                    fontSize: Spaces().smallestSize),
+                backgroundColor: Pallet().red_R,
+                onPressed: (){
+                  main();
+                  print(snapshot.error);
+                },
+                icon: Icon(Icons.refresh),
+              ),
+              body: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage("images/background.png"),
+                    fit: BoxFit.fitHeight,
+                  ),
+                ),
+                child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset('images/logo.png'),
+                        Widgets().arabicText(
+                            text: 'روشتة',
+                            color: Pallet().red_R,
+                            fontSize: Spaces().bigTitleSize),
+                      ],
+                    )),
+              ),
+            ) ;
           else {
             return Scaffold(
               backgroundColor: Pallet().background_R,

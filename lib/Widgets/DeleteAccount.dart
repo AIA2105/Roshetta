@@ -66,8 +66,13 @@ class _DeleteAccountState extends State<DeleteAccount> {
                     DoctorDatabase().delete(user.uid);
                     await FirebaseFirestore.instance.collection(Strings().fireStoreTableName).doc(user.uid).delete();
                     await FirebaseAuth.instance.currentUser.delete();
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => LoginScreen()));
+                    Navigator.of(context)
+                        .pushAndRemoveUntil(
+                      CupertinoPageRoute(
+                          builder: (context) => LoginScreen()
+                      ),
+                          (_) => false,
+                    );
                     print('Auth & data deleted');
                   },
                 ),

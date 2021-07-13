@@ -9,6 +9,7 @@ import 'package:roshetta/Widgets/DeleteAccount.dart';
 import 'package:roshetta/Widgets/EditAccount.dart';
 import 'package:roshetta/Widgets/ExitAccount.dart';
 import 'package:roshetta/Widgets/Widgets.dart';
+import '../../main.dart';
 import '../Login System/LoginScreen.dart';
 import 'Doctor.dart';
 import 'DoctorDatabase.dart';
@@ -42,9 +43,39 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
         }else{
           if (snapshot.hasError)
             return Scaffold(
-              backgroundColor:Pallet().background_R,
-              body: Center(child: Text('Error: ${snapshot.error}')),
-            );
+              floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+              floatingActionButton: FloatingActionButton.extended(
+                label: Widgets().arabicText(
+                    text: 'حدثت مشكلة اضغط لإعادة المحاولة',
+                    color: Pallet().white_R,
+                    fontSize: Spaces().smallestSize),
+                backgroundColor: Pallet().red_R,
+                onPressed: (){
+                  main();
+                  print(snapshot.error);
+                },
+                icon: Icon(Icons.refresh),
+              ),
+              body: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage("images/background.png"),
+                    fit: BoxFit.fitHeight,
+                  ),
+                ),
+                child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset('images/logo.png'),
+                        Widgets().arabicText(
+                            text: 'روشتة',
+                            color: Pallet().red_R,
+                            fontSize: Spaces().bigTitleSize),
+                      ],
+                    )),
+              ),
+            ) ;
           else {
             return Scaffold(
               backgroundColor:Pallet().background_R,
